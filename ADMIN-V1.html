@@ -1,0 +1,198 @@
+<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEXUS ADMIN FINAL</title><style>
+:root{--bg:#090a0e;--panel:#151720;--gold:#d8b765;--muted:#a5a8b2;--line:#30333e;--ok:#245b43;--bad:#632b32}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#211d14,#090a0e 55%);color:#f5f2e9;font-family:system-ui,sans-serif}.wrap{max-width:1050px;margin:auto;padding:18px}.top,.row{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.logo{font-size:25px;font-weight:900;color:var(--gold)}.pill{border:1px solid #6e5b2e;color:var(--gold);padding:7px 12px;border-radius:30px;font-size:12px}.card{background:linear-gradient(145deg,#191b23,#111219);border:1px solid var(--line);border-radius:18px;padding:18px;margin:14px 0}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.metric{background:#20222b;border-radius:14px;padding:16px}.metric b{display:block;font-size:24px;color:var(--gold);margin-top:8px}.muted{color:var(--muted);font-size:13px}.field{width:100%;padding:13px;background:#0c0e13;border:1px solid #343744;border-radius:11px;color:white;margin:6px 0 12px;font:inherit}.btn{border:1px solid transparent;border-radius:13px;padding:12px 16px;min-height:46px;font-weight:900;font-size:14px;letter-spacing:.1px;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:.18s ease;box-shadow:0 5px 14px rgba(0,0,0,.18);white-space:nowrap}.btn:active{transform:scale(.97)}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}.btn.secondary{background:linear-gradient(180deg,#292d38,#20232c);color:#f4f4f4;border-color:#3d4250}.btn.ok{background:linear-gradient(180deg,#20a66b,#087d4b);color:#fff;border-color:#36c88a}.btn.bad,.danger{background:linear-gradient(180deg,#c64b5b,#8f2636);color:#fff;border-color:#df6877}.member,.item{background:linear-gradient(145deg,#12151d,#0e1016);border:1px solid #2d303b;border-radius:18px;padding:15px;margin:10px 0;box-shadow:0 8px 24px rgba(0,0,0,.16)}.membergrid{display:grid;grid-template-columns:1fr auto;gap:14px}.balance{font-size:21px;color:var(--gold);font-weight:900}.idline{font-size:11px;color:#8f95a3;word-break:break-all;margin-top:5px}.actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:13px}.actions .btn{width:100%;padding:10px 7px;font-size:12px;min-height:48px;white-space:normal;line-height:1.25}.request-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.request-actions .btn{width:100%;min-height:52px;font-size:15px}.member-status{display:inline-flex;align-items:center;gap:5px;margin-top:9px;padding:6px 11px;border-radius:999px;font-size:12px;font-weight:900}.active-status{background:#143b2a;color:#70e0a2;border:1px solid #286b4b}.suspended-status{background:#481f27;color:#ff9ba5;border:1px solid #813744}.request-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.request-meta{line-height:1.9}.request-amount{font-size:23px;font-weight:900;color:var(--gold)}.hidden{display:none!important}@media(max-width:700px){.actions{grid-template-columns:1fr 1fr}.membergrid{grid-template-columns:1fr}.request-actions{grid-template-columns:1fr 1fr}.request-actions .btn{font-size:14px}}.msg{margin-top:12px;padding:11px;border-radius:10px}.err{background:#4b2227;color:#ffdfe1}.okmsg{background:#193d2d;color:#dfffea}.status{padding:4px 9px;border-radius:20px;font-size:12px}.pending{background:#4a3c1d;color:#f1d889}.approved{background:#19432f;color:#72e0a5}.rejected{background:#4b2227;color:#f18a8a}@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr)}.membergrid{grid-template-columns:1fr}.actions .btn{flex:1}}
+</style></head><body><div class="wrap"><div class="top"><div class="logo">NEXUS <span style="color:white">ADMIN</span></div><span class="pill">REAL SUPABASE — FINAL</span></div>
+<section id="gate" class="card" style="max-width:520px;margin:10vh auto"><h2 style="color:var(--gold)">دخول لوحة المدير</h2><input id="email" class="field" type="email" value="khaledmohamed6050@gmail.com" placeholder="البريد الإلكتروني"><input id="password" class="field" type="password" placeholder="كلمة المرور"><button id="loginBtn" class="btn" style="width:100%" onclick="login()">تسجيل دخول المدير</button><div id="loginMsg" class="muted" style="margin-top:12px"></div></section>
+<main id="panel" class="hidden"><div class="row card"><div><b id="who"></b><div class="muted">صلاحية Admin مؤكدة من قاعدة البيانات</div></div><button class="btn secondary" onclick="logout()">تسجيل الخروج</button></div>
+<div class="grid"><div class="metric"><span class="muted">الأعضاء</span><b id="users">0</b></div><div class="metric"><span class="muted">طلبات معلقة</span><b id="pending">0</b></div><div class="metric"><span class="muted">إجمالي الأرصدة</span><b id="totalBalance">0</b></div><div class="metric"><span class="muted">المنصة</span><b id="platform">...</b></div></div>
+<div class="card"><div class="row"><h2>💳 طلبات الإيداع والسحب — الموافقات</h2><button class="btn secondary" onclick="loadRequests()">تحديث الطلبات</button></div><div class="muted" style="margin:4px 0 12px">الطلبات المعلقة تظهر هنا أولًا، وبجوار كل طلب زر قبول وزر رفض واضحان.</div><div id="requests">جاري التحميل...</div></div><div class="card"><h2>💳 رقم الإيداع</h2><p class="muted">ضع رقم التحويل الذي سيظهر للعميل داخل صفحة الإيداع.</p><input id="depositNumberAdmin" class="field" inputmode="tel" placeholder="اكتب رقم الإيداع"><button class="btn" onclick="saveDepositNumber()">💾 حفظ رقم الإيداع</button><div id="paymentMsg" class="muted" style="margin-top:8px"></div></div><div class="card"><div class="row"><h2>👥 الأعضاء والأرصدة</h2><button class="btn secondary" onclick="loadAll()">تحديث</button></div><input id="search" class="field" placeholder="بحث برقم العميل أو الاسم أو الهاتف أو البريد أو UUID" oninput="renderMembers()"><div id="members">جاري التحميل...</div></div>
+<div class="card">
+<h2>📢 بانر الدخول الأول للعميل</h2>
+<p class="muted">العميل يشاهد البانر مرة واحدة لكل نسخة تحفظها هنا. عند حفظ بانر جديد سيظهر للعملاء مرة أخرى.</p>
+<label class="muted">العنوان</label>
+<input id="bannerTitle" class="field" placeholder="عنوان البانر">
+<label class="muted">الرسالة</label>
+<textarea id="bannerMessage" class="field" style="min-height:110px;resize:vertical" placeholder="اكتب محتوى البانر"></textarea>
+<label class="muted">رابط صورة البانر — اختياري</label>
+<input id="bannerImageUrl" class="field" placeholder="https://..."><br>
+<label class="muted">نص الزر — اختياري</label>
+<input id="bannerButtonText" class="field" placeholder="مثال: معرفة المزيد">
+<label class="muted">رابط الزر — اختياري</label>
+<input id="bannerButtonUrl" class="field" placeholder="https://...">
+<label style="display:flex;align-items:center;gap:8px;margin:6px 0 14px"><input id="bannerEnabled" type="checkbox" checked style="width:20px;height:20px"> تشغيل البانر</label>
+<button class="btn" onclick="saveLoginBanner()">💾 حفظ ونشر البانر</button>
+<div id="bannerMsg" class="muted" style="margin-top:8px"></div>
+</div>
+
+<div class="card"><h2>💰 تعديل رصيد مباشر</h2><input id="memberId" class="field" placeholder="User UUID"><input id="amount" class="field" type="number" step="0.01" placeholder="+ إضافة / - خصم"><input id="reason" class="field" placeholder="سبب التعديل"><button class="btn" onclick="adjustBalance()">تنفيذ تعديل الرصيد</button></div>
+
+<div class="card"><div class="row"><h2>⚙️ إعدادات المنصة</h2><button class="btn secondary" onclick="togglePlatform()">تبديل الحالة</button></div><p>حالة المنصة الحالية: <b id="platformText">...</b></p></div></main></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+const SUPABASE_URL='https://ghnhxaweowrmwgptenxq.supabase.co'.trim();
+const SUPABASE_KEY='sb_publishable_kZbpMZTIOnL-OF0pSSDxLQ_KG1i4y7b'.trim();
+let db=null,members=[];
+function init(){
+if(db)return db;
+if(!window.supabase||typeof window.supabase.createClient!=='function')throw new Error('Supabase SDK لم يتم تحميله. افتح الصفحة مع الإنترنت.');
+db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+return db
+}
+function money(n){return Number(n||0).toLocaleString('ar-EG',{minimumFractionDigits:2,maximumFractionDigits:2})}function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function msg(t,b=false){const x=document.getElementById('loginMsg');x.textContent=t;x.className=b?'msg err':'msg okmsg'}
+async function login(){
+if(!/^https:\/\/[^\s]+\.supabase\.co$/i.test(SUPABASE_URL))return msg('إعداد Supabase URL غير صحيح.',true);
+const email=document.getElementById('email').value.trim(),password=document.getElementById('password').value;if(!email||!password){msg('اكتب البريد وكلمة المرور.',true);return}const btn=document.getElementById('loginBtn');btn.disabled=true;msg('جاري التحقق...');try{const c=init();const r=await c.auth.signInWithPassword({email,password});if(r.error)throw r.error;if(!r.data.user)throw new Error('لم يتم إنشاء جلسة دخول.');const p=await c.from('profiles').select('role,full_name').eq('id',r.data.user.id).maybeSingle();if(p.error)throw p.error;if(p.data?.role!=='admin'){await c.auth.signOut();throw new Error('هذا الحساب ليس Admin.');}document.getElementById('who').textContent=(p.data.full_name||email)+' — Admin';document.getElementById('gate').classList.add('hidden');document.getElementById('panel').classList.remove('hidden');await loadAll()}catch(e){msg(e.message||String(e),true)}finally{btn.disabled=false}}
+async function boot(){try{const c=init();const s=await c.auth.getSession();if(s.data.session){const p=await c.from('profiles').select('role,full_name').eq('id',s.data.session.user.id).maybeSingle();if(p.data?.role==='admin'){document.getElementById('who').textContent=(p.data.full_name||s.data.session.user.email)+' — Admin';document.getElementById('gate').classList.add('hidden');document.getElementById('panel').classList.remove('hidden');await loadAll()}}}catch(e){document.getElementById('loginMsg').textContent=e.message||String(e)}}
+async function loadAll(){await Promise.all([loadMembers(),loadRequests(),loadPaymentSettings(),loadPlatform(),loadLoginBanner()])}
+async function loadLoginBanner(){
+ try{
+  const {data,error}=await init().rpc('admin_get_login_banner');
+  if(error)throw error;
+  const x=Array.isArray(data)?data[0]:data;
+  if(!x)return;
+  document.getElementById('bannerTitle').value=x.title||'';
+  document.getElementById('bannerMessage').value=x.message||'';
+  document.getElementById('bannerImageUrl').value=x.image_url||'';
+  document.getElementById('bannerButtonText').value=x.button_text||'';
+  document.getElementById('bannerButtonUrl').value=x.button_url||'';
+  document.getElementById('bannerEnabled').checked=x.enabled!==false;
+  document.getElementById('bannerMsg').textContent='النسخة الحالية: '+(x.version_no||1);
+ }catch(e){document.getElementById('bannerMsg').textContent='تعذر تحميل البانر: '+(e.message||String(e));}
+}
+async function saveLoginBanner(){
+ const title=document.getElementById('bannerTitle').value.trim();
+ const message=document.getElementById('bannerMessage').value.trim();
+ const image=document.getElementById('bannerImageUrl').value.trim();
+ const buttonText=document.getElementById('bannerButtonText').value.trim();
+ const buttonUrl=document.getElementById('bannerButtonUrl').value.trim();
+ const enabled=document.getElementById('bannerEnabled').checked;
+ if(!title||!message)return alert('اكتب عنوان البانر والرسالة.');
+ const btn=document.querySelector('[onclick="saveLoginBanner()"]'); if(btn)btn.disabled=true;
+ try{
+  const {data,error}=await init().rpc('admin_save_login_banner',{p_enabled:enabled,p_title:title,p_message:message,p_image_url:image||null,p_button_text:buttonText||null,p_button_url:buttonUrl||null});
+  if(error)throw error;
+  if(data!==true)throw new Error('لم يتم تأكيد حفظ البانر.');
+  document.getElementById('bannerMsg').textContent='تم حفظ البانر ونشر نسخة جديدة للعملاء.';
+  alert('تم حفظ البانر بنجاح.');
+  await loadLoginBanner();
+ }catch(e){alert('تعذر حفظ البانر: '+(e.message||String(e)));}
+ finally{if(btn)btn.disabled=false;}
+}
+async function loadMembers(){try{const {data,error}=await init().rpc('admin_get_members');if(error)throw error;members=data||[];document.getElementById('users').textContent=members.length;document.getElementById('totalBalance').textContent=money(members.reduce((s,x)=>s+Number(x.balance||0),0));renderMembers()}catch(e){document.getElementById('members').innerHTML='<div class="msg err">'+esc(e.message)+'</div>'}}
+function renderMembers(){
+const q=(document.getElementById('search').value||'').toLowerCase().trim();
+const list=members.filter(x=>!q||[x.full_name,x.phone,x.email,x.user_id,x.customer_code].some(v=>String(v||'').toLowerCase().includes(q)));
+document.getElementById('members').innerHTML=list.map(x=>{
+const status=(x.account_status||'active')==='suspended'?'suspended':'active';
+const statusText=status==='suspended'?'موقوف مؤقتًا':'نشط';
+const statusClass=status==='suspended'?'suspended-status':'active-status';
+const toggleText=status==='suspended'?'تفعيل الحساب':'إيقاف مؤقت';
+const toggleClass=status==='suspended'?'btn ok':'btn bad';
+const isAdmin=String(x.role||'member').toLowerCase()==='admin';
+return `<div class="member"><div class="membergrid"><div><b>${esc(x.full_name||'بدون اسم')}</b><div class="muted">📧 ${esc(x.email||'غير متاح')}</div><div class="muted">📱 ${esc(x.phone||'غير مسجل')}</div><div class="idline">رقم العميل: <b style="color:var(--gold)">${esc(x.customer_code||'غير موجود')}</b></div><div class="idline">UUID: ${esc(x.user_id)}</div><div class="idline">الصلاحية: ${esc(x.role||'member')}</div><span class="member-status ${statusClass}">الحالة: ${statusText}</span></div><div><div class="balance">${money(x.balance)} ج.م</div><div class="muted">الرصيد الحالي</div></div></div><div class="actions"><button class="btn secondary" onclick="copyId('${x.user_id}')">🆔 نسخ UUID</button><button class="btn" onclick="selectMember('${x.user_id}')">📌 اختيار</button>${isAdmin?'':`<button class="${toggleClass}" onclick="toggleMemberStatus('${x.user_id}','${status}')">${toggleText}</button>`}<button class="btn danger" onclick="deleteMember('${x.user_id}','${esc(x.email||x.user_id)}')">🗑️ حذف العضو</button></div></div>`}).join('')||'<div class="muted">لا يوجد أعضاء.</div>'}
+function copyId(id){navigator.clipboard?.writeText(id).then(()=>alert('تم نسخ UUID')).catch(()=>prompt('UUID:',id))}function selectMember(id){document.getElementById('memberId').value=id;document.getElementById('amount').focus();document.getElementById('amount').scrollIntoView({behavior:'smooth',block:'center'})}
+async function adjustBalance(){const uid=document.getElementById('memberId').value.trim(),amount=Number(document.getElementById('amount').value),reason=document.getElementById('reason').value.trim();if(!uid||!amount||!reason)return alert('أكمل UUID والمبلغ والسبب.');const {error}=await init().rpc('admin_adjust_balance',{p_user_id:uid,p_amount:amount,p_reason:reason});if(error)return alert(error.message);alert('تم تعديل الرصيد.');document.getElementById('amount').value='';document.getElementById('reason').value='';await loadMembers()}
+async function loadRequests(){
+try{
+const {data,error}=await init().rpc('admin_get_requests');
+if(error)throw error;
+const a=data||[],pending=a.filter(x=>x.status==='pending');
+document.getElementById('pending').textContent=pending.length;
+const target=document.getElementById('requests');
+if(!a.length){target.innerHTML='<div class="muted">لا توجد طلبات.</div>';return}
+target.innerHTML=a.map(x=>{
+const type=x.request_type==='deposit'?'إيداع':'سحب';
+const statusText=x.status==='pending'?'معلق':x.status==='approved'?'مقبول':'مرفوض';
+const proof='';
+const destination=x.destination_number?`<div class="muted">📤 رقم الاستقبال: ${esc(x.destination_number)}</div>`:'';
+const payment=x.payment_number?`<div class="muted">💳 رقم الدفع: ${esc(x.payment_number)}</div>`:'';const adminNote=x.admin_note?`<div class="muted">📝 ملاحظة: ${esc(x.admin_note)}</div>`:'';
+return `<div class="item"><div class="request-head"><div><b>#${x.id} — ${type}</b><div class="muted">${esc(x.email||x.user_id)}</div></div><div class="request-amount">${money(x.amount)} ج.م</div><span class="status ${x.status}">${statusText}</span></div><div class="muted request-meta">UUID: ${esc(x.user_id)}<br>${new Date(x.created_at).toLocaleString('ar-EG')}<br>${payment}${destination}${adminNote}${proof}</div>${x.status==='pending'?`<div class="request-actions"><button id="approve-${x.id}" class="btn ok" onclick="processRequest(${x.id},true)">✅ قبول الطلب</button><button id="reject-${x.id}" class="btn bad" onclick="processRequest(${x.id},false)">❌ رفض الطلب</button></div>`:''}</div>`}).join('')
+}catch(e){document.getElementById('requests').innerHTML='<div class="msg err">تعذر تحميل الطلبات: '+esc(e.message)+'</div>'}}
+async function processRequest(id,approve){
+const result=await openActionModal(
+  approve?'قبول الطلب':'رفض الطلب',
+  `هل تريد ${approve?'قبول':'رفض'} الطلب رقم #${id}؟`,
+  approve?'موافق — قبول الطلب':'موافق — رفض الطلب',
+  approve?'ok':'bad',
+  true
+);
+if(!result.ok)return;
+const a=document.getElementById('approve-'+id),r=document.getElementById('reject-'+id);
+if(a)a.disabled=true;if(r)r.disabled=true;
+try{
+const response=await Promise.race([
+  init().rpc('admin_process_wallet_request',{p_request_id:Number(id),p_approve:Boolean(approve),p_note:result.note||null}),
+  new Promise((_,reject)=>setTimeout(()=>reject(new Error('انتهت مهلة معالجة الطلب بعد 15 ثانية.')),15000))
+]);
+if(response.error)throw response.error;
+if(!response.data?.ok)throw new Error('لم يتم تأكيد تحديث الطلب.');
+alert(approve?'تم قبول الطلب وتحديث الرصيد بنجاح.':'تم رفض الطلب بنجاح.');
+await loadAll();
+}catch(e){
+alert('تعذر معالجة الطلب: '+(e.message||String(e)));
+if(a)a.disabled=false;if(r)r.disabled=false;
+}}
+async function toggleMemberStatus(id,current){
+const next=current==='suspended'?'active':'suspended';
+const result=await openActionModal(
+  next==='suspended'?'إيقاف الحساب مؤقتًا':'تفعيل الحساب',
+  next==='suspended'?'هل تريد إيقاف حساب هذا العضو مؤقتًا؟':'هل تريد تفعيل حساب هذا العضو؟',
+  'موافق',
+  next==='suspended'?'bad':'ok',
+  false
+);
+if(!result.ok)return;
+try{
+const {data,error}=await init().rpc('admin_set_member_status',{p_user_id:id,p_status:next});
+if(error)throw error;
+alert(next==='suspended'?'تم إيقاف الحساب مؤقتًا.':'تم تفعيل الحساب.');
+await loadMembers();
+}catch(e){alert('تعذر تغيير حالة الحساب: '+(e.message||String(e)))}
+}
+async function loadPaymentSettings(){try{const {data,error}=await init().rpc('admin_get_payment_settings');if(error)throw error;document.getElementById('depositNumberAdmin').value=data?.[0]?.deposit_number||'';document.getElementById('paymentMsg').textContent=''}catch(e){document.getElementById('paymentMsg').textContent=e.message||String(e)}}
+async function saveDepositNumber(){const v=document.getElementById('depositNumberAdmin').value.trim();if(!v)return alert('اكتب رقم الإيداع.');const {error}=await init().rpc('admin_set_deposit_number',{p_number:v});if(error)return alert('تعذر حفظ رقم الإيداع: '+error.message);document.getElementById('paymentMsg').textContent='تم حفظ رقم الإيداع بنجاح.'}
+async function loadPlatform(){try{const {data,error}=await init().rpc('admin_get_platform_open');if(error)throw error;const open=!!data;document.getElementById('platform').textContent=open?'مفتوحة':'مغلقة';document.getElementById('platformText').textContent=open?'مفتوحة':'مغلقة'}catch(e){document.getElementById('platform').textContent='خطأ';document.getElementById('platformText').textContent=e.message}}
+async function togglePlatform(){const cur=document.getElementById('platform').textContent==='مفتوحة';const {error}=await init().rpc('admin_set_platform_open',{p_open:!cur});if(error)return alert(error.message);await loadPlatform()}
+async function deleteMember(id,email){const result=await openActionModal('🗑️ حذف العضو','هل تريد حذف العضو نهائيًا؟\n'+email,'حذف نهائي','bad',false);if(!result.ok)return;try{const {error}=await init().rpc('admin_delete_user',{p_user_id:id});if(error)throw error;alert('تم حذف العضو بنجاح.');await loadAll()}catch(e){alert('تعذر حذف العضو: '+(e.message||String(e)))}}
+async function logout(){await init().auth.signOut();location.reload()}boot();
+</script>
+<div id="actionModal" class="action-modal hidden">
+  <div class="action-modal-box">
+    <div id="actionModalTitle" class="action-modal-title">تأكيد العملية</div>
+    <div id="actionModalText" class="action-modal-text"></div>
+    <textarea id="actionModalNote" class="field action-modal-note hidden" placeholder="ملاحظة اختيارية"></textarea>
+    <div class="action-modal-actions">
+      <button id="actionModalCancel" class="btn secondary" type="button">إلغاء</button>
+      <button id="actionModalConfirm" class="btn ok" type="button">موافق</button>
+    </div>
+  </div>
+</div>
+<style>
+.action-modal{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:18px}
+.action-modal.hidden{display:none!important}
+.action-modal-box{width:min(440px,100%);background:#151820;border:1px solid #3a3f4c;border-radius:20px;padding:20px;box-shadow:0 20px 70px rgba(0,0,0,.55);direction:rtl}
+.action-modal-title{font-size:21px;font-weight:900;color:#e5c35c;margin-bottom:12px}
+.action-modal-text{font-size:16px;line-height:1.8;color:#eee;margin-bottom:14px}
+.action-modal-note{width:100%;min-height:90px;resize:vertical;box-sizing:border-box}
+.action-modal-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.action-modal-actions .btn{width:100%;min-height:52px;font-size:16px}
+</style>
+<script>
+let nexusActionResolve=null;
+function openActionModal(title,text,confirmText='موافق',confirmClass='ok',withNote=false){
+  return new Promise(resolve=>{
+    nexusActionResolve=resolve;
+    const m=document.getElementById('actionModal');
+    const t=document.getElementById('actionModalTitle');
+    const tx=document.getElementById('actionModalText');
+    const n=document.getElementById('actionModalNote');
+    const c=document.getElementById('actionModalConfirm');
+    const cancel=document.getElementById('actionModalCancel');
+    t.textContent=title; tx.textContent=text;
+    n.value=''; n.classList.toggle('hidden',!withNote);
+    c.textContent=confirmText; c.className='btn '+confirmClass;
+    m.classList.remove('hidden');
+    c.onclick=()=>{const note=n.value.trim();m.classList.add('hidden');const r=nexusActionResolve;nexusActionResolve=null;r({ok:true,note})};
+    cancel.onclick=()=>{m.classList.add('hidden');const r=nexusActionResolve;nexusActionResolve=null;r({ok:false,note:''})};
+  });
+}
+</script>
+</body></html>
