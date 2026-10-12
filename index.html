@@ -740,15 +740,39 @@ async function loadPaymentSettings(){
  updateDepositMethodUI();updateDepositConversion();
 }
 async function copyUsdtAddress(){
- const network=String($('depositUsdtNetwork')?.value||'TRC20').toUpperCase();const address=String(network==='BEP20'?nexusDepositMethods.usdt_bep20_address:nexusDepositMethods.usdt_trc20_address).trim();if(!address){toast('الأدمن لم يضف عنوان USDT لهذه الشبكة بعد.');return;}
- try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(address);}else{const temp=document.createElement('textarea');temp.value=address;temp.style.position='fixed';temp.style.opacity='0';document.body.appendChild(temp);temp.select();const ok=document.execCommand('copy');temp.remove();if(!ok)throw new Error('copy failed');}
-  if($('usdtCopyMsg'))$('usdtCopyMsg').textContent='تم نسخ عنوان المحفظة كاملًا.';toast('تم نسخ عنوان USDT كاملًا.');
- }catch(e){window.prompt('انسخ عنوان محفظة USDT كاملًا:',address);}
+ const method=$('depositMethodSelect')?.value||'vodafone_cash';
+ if(method!=='usdt'){toast('اختر USDT أولًا لنسخ عنوان المحفظة.');return;}
+ const network=String($('depositUsdtNetwork')?.value||'TRC20').toUpperCase();
+ const address=String(network==='BEP20'?nexusDepositMethods.usdt_bep20_address:nexusDepositMethods.usdt_trc20_address).trim();
+ if(!address){toast('الأدمن لم يضف عنوان USDT لهذه الشبكة بعد.');return;}
+ try{
+  if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(address);}
+  else{
+   const temp=document.createElement('textarea');temp.value=address;temp.style.position='fixed';temp.style.opacity='0';document.body.appendChild(temp);temp.select();
+   const ok=document.execCommand('copy');temp.remove();if(!ok)throw new Error('copy failed');
+  }
+  if($('usdtCopyMsg'))$('usdtCopyMsg').textContent='تم نسخ عنوان المحفظة كاملًا.';
+  toast('تم نسخ عنوان USDT كاملًا.');
+ }catch(e){window.prompt('انسخ عنوان USDT كاملًا:',address);}
 }
 function updateUsdtTransferLink(){
- const actions=$('usdtTransferActions'),link=$('usdtExplorerLink');const network=String($('depositUsdtNetwork')?.value||'TRC20').toUpperCase();const address=String(network==='BEP20'?nexusDepositMethods.usdt_bep20_address:nexusDepositMethods.usdt_trc20_address).trim();
- if(actions)actions.classList.toggle('hidden',!address);
- if(link){const base=network==='BEP20'?'https://bscscan.com/address/':'https://tronscan.org/#/address/';link.href=base+encodeURIComponent(address);link.textContent=network==='BEP20'?'🔗 فتح العنوان على BscScan':'🔗 فتح العنوان على TronScan';}
+ const actions=$('usdtTransferActions'),link=$('usdtExplorerLink');
+ const method=$('depositMethodSelect')?.value||'vodafone_cash';
+ const network=String($('depositUsdtNetwork')?.value||'TRC20').toUpperCase();
+ const address=String(network==='BEP20'?nexusDepositMethods.usdt_bep20_address:nexusDepositMethods.usdt_trc20_address).trim();
+
+ // إظهار أدوات عنوان USDT فقط عند اختيار USDT ووجود عنوان للشبكة المختارة
+ const showUsdt=method==='usdt'&&!!address;
+ if(actions)actions.classList.toggle('hidden',!showUsdt);
+
+ if(link&&showUsdt){
+  const base=network==='BEP20'?'https://bscscan.com/address/':'https://tronscan.org/#/address/';
+  link.href=base+encodeURIComponent(address);
+  link.textContent=network==='BEP20'?'🔗 فتح العنوان على BscScan':'🔗 فتح العنوان على TronScan';
+ }else if(link){
+  link.removeAttribute('href');
+ }
+
  if($('usdtCopyMsg'))$('usdtCopyMsg').textContent='';
 }
 async function loadCustomerWithdrawalMethod(){
