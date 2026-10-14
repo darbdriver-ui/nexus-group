@@ -10,7 +10,7 @@
 /* NEXUS ADMIN — fixed bottom section navigation */
 .admin-bottom-nav{position:fixed;right:0;left:0;bottom:0;z-index:9998;display:none;background:rgba(10,11,15,.97);border-top:1px solid #3a3425;box-shadow:0 -10px 30px rgba(0,0,0,.35);backdrop-filter:blur(12px);padding:7px max(8px,env(safe-area-inset-left)) calc(7px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-right));}
 .admin-bottom-nav.show{display:block}
-.admin-bottom-nav-inner{max-width:1050px;margin:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.admin-bottom-nav-inner{max-width:1050px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
 .admin-nav-btn{appearance:none;border:1px solid transparent;background:transparent;color:#aeb1ba;border-radius:14px;min-height:62px;padding:7px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:inherit;font-weight:800;cursor:pointer;white-space:nowrap}
 .admin-nav-btn .nav-icon{font-size:21px;line-height:1}
 .admin-nav-btn .nav-name{font-size:11px;line-height:1.2}
@@ -18,7 +18,7 @@
 .admin-section{display:none}
 .admin-section.active{display:block}
 body.nav-ready{padding-bottom:88px}
-@media(max-width:600px){.admin-bottom-nav{padding-left:5px;padding-right:5px}.admin-bottom-nav-inner{gap:3px}.admin-nav-btn{min-height:58px;border-radius:12px}.admin-nav-btn .nav-icon{font-size:19px}.admin-nav-btn .nav-name{font-size:10px}}
+@media(max-width:600px){.admin-bottom-nav{padding-left:5px;padding-right:5px}.admin-bottom-nav-inner{grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}.admin-nav-btn{min-height:58px;border-radius:12px}.admin-nav-btn .nav-icon{font-size:19px}.admin-nav-btn .nav-name{font-size:10px}}
 </style></head><body><div class="wrap"><div class="top"><div class="logo">NEXUS <span style="color:white">ADMIN</span></div><span class="pill">REAL SUPABASE — FINAL</span></div>
 <section id="gate" class="card" style="max-width:520px;margin:10vh auto"><h2 style="color:var(--gold)">دخول لوحة المدير</h2><input id="email" class="field" type="email" value="khaledmohamed6050@gmail.com" placeholder="البريد الإلكتروني"><input id="password" class="field" type="password" placeholder="كلمة المرور"><button type="button" id="loginBtn" class="btn" style="width:100%" onclick="login()">تسجيل دخول المدير</button><div id="loginMsg" class="muted" style="margin-top:12px"></div></section>
 <main id="panel" class="hidden"><div class="row card"><div><b id="who"></b><div class="muted">صلاحية Admin مؤكدة من قاعدة البيانات</div></div><button type="button" class="btn secondary" onclick="logout()">تسجيل الخروج</button></div>
@@ -44,6 +44,38 @@ body.nav-ready{padding-bottom:88px}
 <button type="button" class="btn bad" onclick="adjustBalance(-1)">➖ خصم من الرصيد</button>
 </div>
 <div id="balanceMsg" class="muted" style="margin-top:8px"></div>
+</section>
+
+<section id="adminSectionMachines" class="card admin-section">
+ <div class="row"><h2>🖥️ أجهزة العملاء</h2><button type="button" class="btn secondary" onclick="loadAdminMachines()">🔄 تحديث</button></div>
+ <p class="muted">عدد الأجهزة لكل عميل، دخل كل جهاز، وإجمالي الدخل ووقت الانتهاء المتبقي.</p>
+ <div class="grid" style="margin:12px 0">
+  <div class="metric"><span class="muted">إجمالي الأجهزة النشطة</span><b id="machineTotal">—</b></div>
+  <div class="metric"><span class="muted">دخل يومي متوقع</span><b id="machineDailyTotal">—</b></div>
+  <div class="metric"><span class="muted">الدخل المسجل تقديريًا</span><b id="machineEarnedTotal">—</b></div>
+  <div class="metric"><span class="muted">أجهزة منتهية</span><b id="machineExpiredTotal">—</b></div>
+ </div>
+ <input id="machineSearch" class="field" placeholder="ابحث برقم العميل أو الاسم أو الهاتف" oninput="renderAdminMachines()">
+ <div id="adminMachinesList"><div class="muted">اضغط تحديث لتحميل الأجهزة.</div></div>
+</section>
+
+<section id="adminSectionCurrencies" class="card admin-section">
+ <div class="row"><h2>💱 تصنيف العملاء حسب الإيداع</h2><button type="button" class="btn secondary" onclick="loadDepositClassifications()">🔄 تحديث</button></div>
+ <p class="muted">يعرض العملاء الذين لديهم إيداعات مقبولة فقط، مع فصل من أودع بالجنيه المصري عن من أودع بالدولار. من أودع بالعملتين سيظهر في تصنيف «العملتان».</p>
+ <div class="grid" style="margin:12px 0">
+  <div class="metric"><span class="muted">عملاء أودعوا بالجنيه</span><b id="egpDepositorCount">—</b></div>
+  <div class="metric"><span class="muted">عملاء أودعوا بالدولار</span><b id="usdDepositorCount">—</b></div>
+  <div class="metric"><span class="muted">إجمالي إيداعات EGP</span><b id="egpDepositTotal">—</b></div>
+  <div class="metric"><span class="muted">إجمالي إيداعات USD</span><b id="usdDepositTotal">—</b></div>
+ </div>
+ <input id="depositClassSearch" class="field" placeholder="ابحث برقم العميل أو الاسم أو الهاتف" oninput="renderDepositClassifications()">
+ <div class="actions" style="grid-template-columns:repeat(4,minmax(0,1fr))">
+  <button type="button" class="btn secondary" onclick="setDepositClassFilter('all')">الكل</button>
+  <button type="button" class="btn secondary" onclick="setDepositClassFilter('EGP')">إيداع جنيه</button>
+  <button type="button" class="btn secondary" onclick="setDepositClassFilter('USD')">إيداع دولار</button>
+  <button type="button" class="btn secondary" onclick="setDepositClassFilter('BOTH')">العملتان</button>
+ </div>
+ <div id="depositClassificationsList" style="margin-top:12px"><div class="muted">اضغط تحديث لتحميل تصنيفات العملاء.</div></div>
 </section>
 
 <section id="adminSectionRequests" class="card admin-section">
@@ -104,6 +136,8 @@ body.nav-ready{padding-bottom:88px}
   <div class="admin-bottom-nav-inner">
     <button type="button" class="admin-nav-btn active" data-section="adminSectionMembers" onclick="switchAdminSection('adminSectionMembers',this)"><span class="nav-icon">👥</span><span class="nav-name">الأعضاء</span></button>
     <button type="button" class="admin-nav-btn" data-section="adminSectionRequests" onclick="switchAdminSection('adminSectionRequests',this)"><span class="nav-icon">💳</span><span class="nav-name">الطلبات</span></button>
+    <button type="button" class="admin-nav-btn" data-section="adminSectionMachines" onclick="switchAdminSection('adminSectionMachines',this);loadAdminMachines()"><span class="nav-icon">🖥️</span><span class="nav-name">الأجهزة</span></button>
+    <button type="button" class="admin-nav-btn" data-section="adminSectionCurrencies" onclick="switchAdminSection('adminSectionCurrencies',this);loadDepositClassifications()"><span class="nav-icon">💱</span><span class="nav-name">تصنيف العملة</span></button>
     <button type="button" class="admin-nav-btn" data-section="adminSectionSettings" onclick="switchAdminSection('adminSectionSettings',this)"><span class="nav-icon">⚙️</span><span class="nav-name">إعدادات المنصة</span></button>
     <button type="button" class="admin-nav-btn" data-section="adminSectionWelcome" onclick="switchAdminSection('adminSectionWelcome',this)"><span class="nav-icon">📢</span><span class="nav-name">الترحيب</span></button>
   </div>
@@ -164,6 +198,82 @@ async function login(){
 if(!/^https:\/\/[^\s]+\.supabase\.co$/i.test(SUPABASE_URL))return msg('إعداد Supabase URL غير صحيح.',true);
 const email=document.getElementById('email').value.trim(),password=document.getElementById('password').value;if(!email||!password){msg('اكتب البريد وكلمة المرور.',true);return}const btn=document.getElementById('loginBtn');btn.disabled=true;msg('جاري التحقق...');try{const c=init();const r=await c.auth.signInWithPassword({email,password});if(r.error)throw r.error;if(!r.data.user)throw new Error('لم يتم إنشاء جلسة دخول.');const p=await c.from('profiles').select('role,full_name').eq('id',r.data.user.id).maybeSingle();if(p.error)throw p.error;if(p.data?.role!=='admin'){await c.auth.signOut();throw new Error('هذا الحساب ليس Admin.');}document.getElementById('who').textContent=(p.data.full_name||email)+' — Admin';document.getElementById('gate').classList.add('hidden');document.getElementById('panel').classList.remove('hidden');showAdminBottomNav();switchAdminSection('adminSectionMembers',document.querySelector('.admin-nav-btn[data-section="adminSectionMembers"]'));await loadAll()}catch(e){msg(e.message||String(e),true)}finally{btn.disabled=false}}
 async function boot(){try{const c=init();const s=await c.auth.getSession();if(s.data.session){const p=await c.from('profiles').select('role,full_name').eq('id',s.data.session.user.id).maybeSingle();if(p.data?.role==='admin'){document.getElementById('who').textContent=(p.data.full_name||s.data.session.user.email)+' — Admin';document.getElementById('gate').classList.add('hidden');document.getElementById('panel').classList.remove('hidden');showAdminBottomNav();switchAdminSection('adminSectionMembers',document.querySelector('.admin-nav-btn[data-section="adminSectionMembers"]'));await loadAll()}}}catch(e){document.getElementById('loginMsg').textContent=e.message||String(e)}}
+let adminMachines=[];
+async function loadAdminMachines(){
+ const box=document.getElementById('adminMachinesList'); if(!box)return;
+ box.innerHTML='<div class="muted">جاري تحميل الأجهزة...</div>';
+ try{
+  const {data,error}=await init().rpc('admin_get_all_machines');
+  if(error)throw error;
+  adminMachines=Array.isArray(data)?data:[];
+  renderAdminMachines();
+ }catch(e){
+  box.innerHTML='<div class="msg err">تعذر تحميل الأجهزة: '+esc(e.message||String(e))+'<br>تأكد من تشغيل كود SQL الخاص بدالة admin_get_all_machines.</div>';
+ }
+}
+function remainingMachineTime(row){
+ const start=new Date(row.started_at||row.created_at||0);
+ const days=Math.max(0,Number(row.days||10));
+ if(!Number.isFinite(start.getTime())||!row.started_at&&!row.created_at)return 'وقت البدء غير متاح';
+ const end=new Date(start.getTime()+days*86400000),ms=end.getTime()-Date.now();
+ if(ms<=0)return 'انتهى الجهاز';
+ const d=Math.floor(ms/86400000),h=Math.floor((ms%86400000)/3600000),m=Math.floor((ms%3600000)/60000);
+ return (d?d+' يوم ':'')+h+' ساعة '+m+' دقيقة';
+}
+function renderAdminMachines(){
+ const q=(document.getElementById('machineSearch')?.value||'').trim().toLowerCase();
+ const rows=adminMachines.filter(x=>!q||[x.full_name,x.phone,x.customer_code,x.email].some(v=>String(v||'').toLowerCase().includes(q)));
+ const now=Date.now();
+ const isActive=x=>{const start=new Date(x.started_at||0);return Number.isFinite(start.getTime())&&!!x.started_at&&start.getTime()+Math.max(0,Number(x.days||10))*86400000>now};
+ const active=adminMachines.filter(isActive);
+ document.getElementById('machineTotal').textContent=active.length;
+ document.getElementById('machineDailyTotal').textContent=money(active.reduce((a,x)=>a+Number(x.daily_income||0),0))+' ج.م';
+ document.getElementById('machineEarnedTotal').textContent=money(adminMachines.reduce((a,x)=>a+Number(x.earned_income??(Number(x.daily_income||0)*Math.min(Number(x.days||10),Math.max(0,Math.floor((Date.now()-new Date(x.started_at||Date.now()).getTime())/86400000)+1)))),0))+' ج.م';
+ document.getElementById('machineExpiredTotal').textContent=adminMachines.filter(x=>!isActive(x)).length;
+ const groups=new Map();
+ rows.forEach(x=>{const key=x.user_id||x.customer_code||x.email||'unknown';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(x)});
+ const html=[...groups.entries()].map(([key,items])=>{
+  const first=items[0],activeCount=items.filter(isActive).length;
+  return `<div class="member"><div class="row"><div><b>${esc(first.full_name||'بدون اسم')}</b><div class="muted">رقم العميل: ${esc(first.customer_code||'غير موجود')} · الهاتف: ${esc(first.phone||'غير مسجل')}</div><div class="muted">الأجهزة: ${items.length} · النشطة: ${activeCount}</div></div><div class="balance">${money(items.reduce((a,x)=>a+Number(x.daily_income||0),0))} ج.م <div class="muted">دخل يومي للأجهزة</div></div></div><div style="display:grid;gap:9px;margin-top:12px">${items.map(x=>`<div class="item" style="margin:0"><div class="row"><b>⚙️ ${esc(x.package_name||('جهاز VIP '+(x.package_id??'')))}</b><span class="status ${isActive(x)?'approved':'rejected'}">${isActive(x)?'نشط':'منتهي'}</span></div><div class="muted" style="line-height:1.9;margin-top:6px">سعر الجهاز: <b>${money(x.price)} ج.م</b><br>الدخل اليومي: <b style="color:var(--gold)">${money(x.daily_income)} ج.م</b><br>الدخل المسجل تقديريًا: <b>${money(x.earned_income??(Number(x.daily_income||0)*Math.min(Number(x.days||10),Math.max(0,Math.floor((Date.now()-new Date(x.started_at||Date.now()).getTime())/86400000)+1))))} ج.م</b><br>مدة الجهاز: ${Number(x.days||10)} أيام<br>الوقت المتبقي: <b>${esc(remainingMachineTime(x))}</b><br>تاريخ البداية: ${x.started_at?new Date(x.started_at).toLocaleString('ar-EG'):'غير متاح'}</div></div>`).join('')}</div></div>`;
+ }).join('');
+ document.getElementById('adminMachinesList').innerHTML=html||'<div class="muted">لا توجد أجهزة مطابقة للبحث.</div>';
+}
+let depositClassificationRows=[];
+let depositClassFilter='all';
+function setDepositClassFilter(filter){depositClassFilter=filter;renderDepositClassifications()}
+async function loadDepositClassifications(){
+ const target=document.getElementById('depositClassificationsList');
+ if(target)target.innerHTML='<div class="muted">جاري تحميل تصنيفات الإيداع...</div>';
+ try{
+  const {data,error}=await init().rpc('admin_get_deposit_classifications');
+  if(error)throw error;
+  depositClassificationRows=data||[];
+  const egp=depositClassificationRows.filter(x=>Number(x.egp_deposit_count||0)>0);
+  const usd=depositClassificationRows.filter(x=>Number(x.usd_deposit_count||0)>0);
+  document.getElementById('egpDepositorCount').textContent=egp.length;
+  document.getElementById('usdDepositorCount').textContent=usd.length;
+  document.getElementById('egpDepositTotal').textContent=money(egp.reduce((a,x)=>a+Number(x.egp_deposit_total||0),0))+' ج.م';
+  document.getElementById('usdDepositTotal').textContent=money(usd.reduce((a,x)=>a+Number(x.usd_deposit_total||0),0))+' USD';
+  renderDepositClassifications();
+ }catch(e){if(target)target.innerHTML='<div class="msg err">تعذر تحميل التصنيف: '+esc(e.message||String(e))+'<br>تأكد من تشغيل ملف SQL المرفق.</div>';}
+}
+function renderDepositClassifications(){
+ const target=document.getElementById('depositClassificationsList');if(!target)return;
+ const q=(document.getElementById('depositClassSearch')?.value||'').trim().toLowerCase();
+ const rows=depositClassificationRows.filter(x=>{
+  const egp=Number(x.egp_deposit_count||0)>0,usd=Number(x.usd_deposit_count||0)>0;
+  const type=egp&&usd?'BOTH':egp?'EGP':usd?'USD':'NONE';
+  const matches=depositClassFilter==='all'||type===depositClassFilter;
+  const text=[x.full_name,x.phone,x.email,x.customer_code,x.user_id].some(v=>String(v||'').toLowerCase().includes(q));
+  return matches&&text;
+ });
+ target.innerHTML=rows.map(x=>{
+  const egp=Number(x.egp_deposit_count||0)>0,usd=Number(x.usd_deposit_count||0)>0;
+  const label=egp&&usd?'أودع بالجنيه والدولار':egp?'أودع بالجنيه المصري':'أودع بالدولار';
+  const cls=egp&&usd?'pending':'approved';
+  return `<div class="member"><div class="row"><div><b>${esc(x.full_name||'بدون اسم')}</b><div class="muted">رقم العميل: <b style="color:var(--gold)">${esc(x.customer_code||'غير موجود')}</b></div><div class="muted">📱 ${esc(x.phone||'غير مسجل')} · ${esc(x.email||'لا يوجد بريد')}</div></div><span class="status ${cls}">${label}</span></div><div class="grid" style="margin-top:12px"><div class="metric"><span class="muted">عدد إيداعات الجنيه المقبولة</span><b>${Number(x.egp_deposit_count||0)}</b><div class="muted">الإجمالي: ${money(x.egp_deposit_total)} ج.م</div></div><div class="metric"><span class="muted">عدد إيداعات الدولار المقبولة</span><b>${Number(x.usd_deposit_count||0)}</b><div class="muted">الإجمالي: ${money(x.usd_deposit_total)} USD</div></div></div></div>`;
+ }).join('')||'<div class="muted">لا يوجد عملاء في هذا التصنيف.</div>';
+}
 async function loadAll(){await Promise.all([loadMembers(),loadRequests(),loadPaymentSettings(),loadPlatform(),loadLoginBanner(),loadPlatformSettings()])}
 async function loadLoginBanner(){
  try{
