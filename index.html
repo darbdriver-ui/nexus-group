@@ -833,10 +833,17 @@ function dailyCycle(start){
  return {count:completed+1,text:`${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`,pct:((elapsed%86400000)/86400000)*100};
 }
 function rentalHtml(r){
- const q=remaining(r.started_at),d=dailyCycle(r.started_at),daily=Number(r.daily_income||0);
+ const q=remaining(r.started_at),d=dailyCycle(r.started_at),pkg=NEXUS_PACKAGES.find(x=>Number(x.id)===Number(r.package_id)),daily=Number(r.daily_income??pkg?.daily??0);
+ const kind=String(r.acquisition_type||'').toLowerCase();
+ const referral=['referral_reward','referral_upgrade','free_referral_upgrade'].includes(kind);
+ const free=['admin_upgrade','manual_upgrade'].includes(kind);
+ const sourceLabel=referral?'⭐ مكافأة إحالة 3 أعضاء':free?'👑 ترقية مجانية من الإدارة':'🛒 استئجار عادي';
+ const reason=String(r.acquisition_reason||'').trim();
+ const sourceHtml=`<div style="margin:8px 0;padding:8px 10px;border-radius:10px;background:rgba(216,183,101,.09);border:1px solid rgba(216,183,101,.28)"><b>${sourceLabel}</b>${free&&reason?`<div class="muted" style="margin-top:4px">سبب الترقية: ${reason.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}</div>`:''}</div>`;
  return `<div class="rental-card" data-start="${r.started_at}">
-  <div class="row"><b>${r.package_name}</b><span class="tag ${q.left?'green':'gold'}">${q.left?'نشطة':'مكتملة'}</span></div>
-  <div class="muted" style="display:flex;flex-direction:column;align-items:flex-start;gap:4px"><span>السعر: ${moneyForEgp(r.price)}</span><span>الدخل اليومي: ${moneyForEgp(daily)}</span></div>
+  <div class="row"><b>${r.package_name||pkg?.name||('VIP '+r.package_id)}</b><span class="tag ${q.left?'green':'gold'}">${q.left?'نشطة':'مكتملة'}</span></div>
+  ${sourceHtml}
+  <div class="muted" style="display:flex;flex-direction:column;align-items:flex-start;gap:4px"><span>السعر: ${moneyForEgp(r.price||0)}</span><span>الدخل اليومي: ${moneyForEgp(daily)}</span><span>المدة: ${Number(r.days||10)} أيام</span></div>
   ${selectedCurrency === 'USD' ? '' : `<div class="row" style="margin-top:10px"><span class="muted">💰 الدخل اليومي</span><b>${fmt(daily,selectedCurrency)}</div>`}
   <div class="row" style="margin-top:8px"><span class="muted">🔄 الدفعة الحالية</span><b class="daily-payout-count">${d.count} / 10</b></div>
   <div class="muted">⏱️ الدخل اليومي التالي بعد</div>
@@ -852,33 +859,45 @@ async function loadRentals(){
  const rpc=await nexusDB.rpc('get_my_machines');
  if(!rpc.error && Array.isArray(rpc.data)) rows=rpc.data;
  else rpcError=rpc.error;
- // Fallback: read the user's recorded rentals directly if the RPC returns no rows.
- if(rows.length===0 && currentUser){
+ // Always read the source-of-truth rental rows as well: the RPC may omit acquisition metadata.
+ if(currentUser){
    const direct=await nexusDB.from('nexus_machine_rentals')
-     .select('id,user_id,package_id,price,daily_income,days,started_at,last_paid_day,status,created_at')
+     .select('id,user_id,package_id,price,daily_income,days,started_at,last_paid_day,status,created_at,acquisition_type,acquisition_reason')
      .eq('user_id',currentUser.id).order('created_at',{ascending:false});
    if(!direct.error){
-     rows=(direct.data||[]).map(r=>{
-       const p=NEXUS_PACKAGES.find(x=>Number(x.id)===Number(r.package_id));
-       return {...r,package_name:p?.name||('VIP '+Number(r.package_id)),daily_income:r.daily_income??p?.daily??0};
-     });
+     const raw=direct.data||[];
+     if(rows.length){
+       const byId=new Map(raw.map(r=>[String(r.id),r]));
+       rows=rows.map(r=>{const source=byId.get(String(r.id))||raw.find(x=>Number(x.package_id)===Number(r.package_id)&&String(x.started_at||'')===String(r.started_at||''));const merged={...(source||{}),...r};const p=NEXUS_PACKAGES.find(x=>Number(x.id)===Number(merged.package_id));return {...merged,acquisition_type:source?.acquisition_type??merged.acquisition_type,acquisition_reason:source?.acquisition_reason??merged.acquisition_reason,package_name:merged.package_name||p?.name||('VIP '+merged.package_id),daily_income:merged.daily_income??p?.daily??0,days:merged.days??10};});
+     } else {
+       rows=raw.map(r=>{const p=NEXUS_PACKAGES.find(x=>Number(x.id)===Number(r.package_id));return {...r,package_name:p?.name||('VIP '+Number(r.package_id)),daily_income:r.daily_income??p?.daily??0,days:r.days??10};});
+     }
    } else {
      console.error('Rental direct query failed:',direct.error,'RPC:',rpcError);
+     // Preserve RPC results if the metadata query cannot run.
+     rows=rows.map(r=>{const p=NEXUS_PACKAGES.find(x=>Number(x.id)===Number(r.package_id));return {...r,package_name:r.package_name||p?.name||('VIP '+r.package_id),daily_income:r.daily_income??p?.daily??0,days:r.days??10};});
    }
  }
  const box=$('homeRentals');
  if(box) box.innerHTML=rows.length?rows.map(rentalHtml).join(''):'<p class="muted" style="padding:16px">لا توجد آلات مستأجرة ظاهرة لهذا الحساب. راجع صلاحيات قراءة سجل الاستئجار.</p>';
  let vip=0;
- rows.forEach(r=>{
-   const m=String(r.package_name||'').match(/VIP\s*(\d+)/i);
-   const p=NEXUS_PACKAGES.find(x=>Number(x.id)===Number(r.package_id));
-   const pm=String(p?.name||'').match(/VIP\s*(\d+)/i);
-   vip=Math.max(vip,Number(m?.[1]||pm?.[1]||r.package_id)||0);
- });
+ rows.forEach(r=>{const m=String(r.package_name||'').match(/VIP\s*(\d+)/i);const p=NEXUS_PACKAGES.find(x=>Number(x.id)===Number(r.package_id));const pm=String(p?.name||'').match(/VIP\s*(\d+)/i);vip=Math.max(vip,Number(m?.[1]||pm?.[1]||r.package_id)||0);});
  const hv=$('homeVip');if(hv)hv.textContent='VIP '+vip;
 }
-async function loadFinancials(){if(!currentUser)return;let events=[];const l=await nexusDB.rpc('get_my_wallet_ledger');if(!l.error)(l.data||[]).forEach(x=>events.push({date:x.created_at,type:x.reason||'حركة رصيد',amount:Number(x.amount),currency:'EGP',status:'تم التنفيذ',cls:Number(x.amount)>=0?'green':'red'}));const w=await nexusDB.from('wallet_requests').select('id,request_type,amount,status,admin_note,created_at,currency').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(100);if(!w.error)(w.data||[]).filter(x=>x.status!=='approved').forEach(x=>events.push({date:x.created_at,type:x.request_type==='deposit'?'طلب إيداع':'طلب سحب',amount:0,status:x.status==='pending'?'معلق':'مرفوض',reason:x.admin_note||'',cls:x.status==='pending'?'gold':'red'}));const r=await nexusDB.from('nexus_machine_rentals').select('id,package_id,price,daily_income,started_at,last_paid_day,status,created_at').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(100);if(!r.error)(r.data||[]).forEach(x=>{
- events.push({date:x.created_at,type:'استئجار '+(NEXUS_PACKAGES.find(p=>p.id===x.package_id)?.name||'آلة'),amount:-Number(x.price),currency:String(x.currency||'EGP').toUpperCase(),status:x.status==='active'?'نشطة':'مكتملة',cls:'gold'});
+async function loadFinancials(){if(!currentUser)return;let events=[];
+ // Build a lookup of this member's real rental IDs and VIP package names before rendering wallet-ledger descriptions.
+ const rentalNameById=new Map();
+ const rentalLookup=await nexusDB.from('nexus_machine_rentals').select('id,package_id').eq('user_id',currentUser.id);
+ if(!rentalLookup.error)(rentalLookup.data||[]).forEach(r=>{const p=NEXUS_PACKAGES.find(z=>Number(z.id)===Number(r.package_id));rentalNameById.set(String(r.id),p?.name||('VIP '+Number(r.package_id)));});
+ const prettyLedgerReason=(reason,amount=0)=>{const raw=String(reason||'حركة رصيد');const m=raw.match(/دخل\s*الآلة\s*(?:رقم\s*)?(\d+)\s*[-–—]\s*اليوم\s*(\d+)/i);if(m){const n=Number(m[1]);const vipByPackage=NEXUS_PACKAGES.find(p=>Number(p.id)===n)?.name;const vip=rentalNameById.get(String(m[1]));const vipName=vipByPackage||vip;return vipName?`دخل الآلة ${vipName} — اليوم ${m[2]}`:`دخل الآلة رقم ${m[1]} — اليوم ${m[2]}`;}const up=raw.match(/(?:ترقية|جهاز)\s*(?:مجانية\s*)?(?:من\s*الإدارة\s*)?(?:إلى\s*)?VIP\s*(\d+)/i);if(up)return `👑 الترقية المجانية من الإدارة VIP ${up[1]}`;const ref=raw.match(/(?:مكافأة\s*إحالة|إحالة\s*3\s*أعضاء).*?VIP\s*(\d+)|VIP\s*(\d+).*?(?:مكافأة\s*إحالة|إحالة\s*3\s*أعضاء)/i);if(ref)return `⭐ جهاز VIP ${ref[1]||ref[2]} — مكافأة إحالة 3 أعضاء`;return raw;};
+ const l=await nexusDB.rpc('get_my_wallet_ledger');if(!l.error)(l.data||[]).forEach(x=>events.push({date:x.created_at,type:prettyLedgerReason(x.reason,Number(x.amount)),amount:Number(x.amount),currency:'EGP',status:'تم التنفيذ',cls:Number(x.amount)>=0?'green':'red'}));const w=await nexusDB.from('wallet_requests').select('id,request_type,amount,status,admin_note,created_at,currency').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(100);if(!w.error)(w.data||[]).filter(x=>x.status!=='approved').forEach(x=>events.push({date:x.created_at,type:x.request_type==='deposit'?'طلب إيداع':'طلب سحب',amount:0,status:x.status==='pending'?'معلق':'مرفوض',reason:x.admin_note||'',cls:x.status==='pending'?'gold':'red'}));const r=await nexusDB.from('nexus_machine_rentals').select('id,package_id,price,daily_income,days,started_at,last_paid_day,status,created_at,acquisition_type,acquisition_reason').eq('user_id',currentUser.id).order('created_at',{ascending:false}).limit(100);if(!r.error)(r.data||[]).forEach(x=>{
+ const kind=String(x.acquisition_type||'').toLowerCase();
+ const pkg=(NEXUS_PACKAGES.find(p=>Number(p.id)===Number(x.package_id))?.name||('VIP '+x.package_id));
+ const free=['admin_upgrade','manual_upgrade','referral_reward','referral_upgrade','free_referral_upgrade'].includes(kind);
+ const referral=['referral_reward','referral_upgrade','free_referral_upgrade'].includes(kind);
+ const title=referral?`⭐ جهاز ${pkg} — مكافأة إحالة 3 أعضاء`:free?`👑 الترقية المجانية من الإدارة ${pkg}`:`استئجار ${pkg}`;
+ const why=x.acquisition_reason||(referral?'مكافأة إحالة 3 أعضاء':free?'':'شراء مدفوع');
+ const daily=Number(x.daily_income??NEXUS_PACKAGES.find(p=>Number(p.id)===Number(x.package_id))?.daily??0);const sourceLabel=referral?'النوع: مكافأة إحالة 3 أعضاء':free?'النوع: ترقية مجانية من الإدارة':'النوع: استئجار عادي';const adminReason=(!referral&&free&&why)?` · السبب: ${why}`:'';events.push({date:x.created_at,type:title,amount:free?0:-Number(x.price),currency:String(x.currency||'EGP').toUpperCase(),status:free?'ترقية مجانية':x.status==='active'?'نشطة':'مكتملة',reason:`${sourceLabel}${adminReason} · الدخل اليومي: ${moneyForEgp(daily)} ج.م · المدة: ${Number(x.days||10)} أيام`,cls:free?'green':'gold'});
 });const c=await nexusDB.from('nexus_referral_commissions').select('commission_amount,created_at').eq('referrer_id',currentUser.id).order('created_at',{ascending:false}).limit(100);if(!c.error)(c.data||[]).forEach(x=>events.push({date:x.created_at,type:'عمولة إحالة',amount:Number(x.commission_amount),currency:'EGP',status:'مقبولة',reason:'عمولة إحالة',cls:'green'}));events.sort((a,b)=>new Date(b.date)-new Date(a.date));$('financialList').innerHTML=events.length?events.map(x=>`<div class="financial"><div><b>${x.type}</b><div class="muted">${x.reason?esc(x.reason)+'<br>':''}${new Date(x.date).toLocaleString('ar-EG')}</div></div><div style="text-align:left"><b style="color:${x.amount>=0?'var(--green)':'var(--red)'}">${x.amount>0?'+':''}${moneyForEgp(x.amount)}</b><div><span class="tag ${x.cls}">${x.status}</span></div></div></div>`).join(''):'<p class="muted">لا توجد عمليات مالية حتى الآن.</p>'}
 async function loadReferralData(){if(!currentUser)return;const a=await nexusDB.rpc('get_my_referral');if(!a.error){const x=Array.isArray(a.data)?a.data[0]:a.data;if(x){$('referralCode').textContent=x.referral_code||'—';$('referralLink').textContent=x.referral_code?location.origin+'/?ref='+encodeURIComponent(x.referral_code):'—';$('refCount').textContent=x.referred_count||0}}const p=await nexusDB.rpc('get_my_referrals_detail');if(p.error){$('refPeople').innerHTML='<p class="muted">سيظهر كشف الإحالات بعد تشغيل SQL الخاص بالإحالات.</p>';return}const rows=p.data||[];$('refPeople').innerHTML=rows.length?rows.map(x=>`<div class="person"><div class="row"><b>${x.full_name||'عضو'}</b><span class="tag ${Number(x.approved_deposit_total)>0?'green':'gold'}">${Number(x.approved_deposit_total)>0?'قام بإيداع':'لم يودع بعد'}</span></div><div class="muted">رقم الحساب: ${x.customer_code||'—'} · تاريخ التسجيل: ${new Date(x.created_at).toLocaleDateString('ar-EG')}</div><div class="muted">إجمالي الإيداع المقبول: <b>${fmt(x.approved_deposit_total)}</b> · عدد طلبات الإيداع: ${x.deposit_count}</div></div>`).join(''):'<p class="muted">لا توجد إحالات حتى الآن.</p>'}
 async function copyReferral(){const v=$('referralLink').textContent;if(!v||v==='—')return toast('الرابط غير جاهز.');try{await navigator.clipboard.writeText(v);toast('تم نسخ رابط الإحالة')}catch(e){toast('انسخ الرابط يدويًا')}}async function claimReferral(){const code=new URLSearchParams(location.search).get('ref')||localStorage.getItem('nexus_ref_code');if(!code||!currentUser)return;const {error}=await nexusDB.rpc('claim_referral',{p_referral_code:code});if(!error)localStorage.removeItem('nexus_ref_code')}
