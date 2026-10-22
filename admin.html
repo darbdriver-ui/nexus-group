@@ -7,25 +7,19 @@
 @media(max-width:850px){.settings-grid{grid-template-columns:1fr 1fr}.balance-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.settings-grid{grid-template-columns:1fr}.balance-grid{grid-template-columns:1fr 1fr}.balance-grid .field{min-width:0}}
 
-/* NEXUS ADMIN — responsive right-side navigation */
-.admin-menu-toggle{display:none;align-items:center;gap:8px;background:linear-gradient(180deg,#292d38,#20232c);color:var(--gold);border:1px solid #6e5b2e;border-radius:12px;padding:10px 13px;font:inherit;font-weight:900;cursor:pointer}
-.admin-sidebar{position:fixed;z-index:10000;top:0;right:0;bottom:0;width:270px;max-width:86vw;background:linear-gradient(180deg,#151720,#090a0e);border-left:1px solid #51452a;box-shadow:-15px 0 40px rgba(0,0,0,.38);padding:18px 13px;overflow-y:auto;transform:translateX(110%);visibility:hidden;transition:transform .22s ease,visibility .22s ease}
-.admin-sidebar.open{transform:translateX(0);visibility:visible}
-.admin-sidebar-head{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:4px 4px 18px;border-bottom:1px solid #30333e}
-.admin-sidebar-head .logo{font-size:20px}
-.admin-sidebar-close{background:#20232c;color:#eee;border:1px solid #3d4250;border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer}
-.admin-sidebar-label{color:var(--muted);font-size:12px;font-weight:800;padding:18px 10px 8px}
-.admin-sidebar-nav{display:grid;gap:7px}
-.admin-sidebar .admin-nav-btn{width:100%;min-height:54px;flex-direction:row;justify-content:flex-start;gap:12px;padding:11px 13px;white-space:normal;text-align:right;border-radius:12px}
-.admin-sidebar .admin-nav-btn .nav-icon{font-size:21px;width:30px;text-align:center}
-.admin-sidebar .admin-nav-btn .nav-name{font-size:14px}
-.admin-sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.58);z-index:9999;display:none}
-.admin-sidebar-overlay.show{display:block}
+/* NEXUS ADMIN — fixed bottom section navigation */
+.admin-bottom-nav{position:fixed;right:0;left:0;bottom:0;z-index:9998;display:none;background:rgba(10,11,15,.97);border-top:1px solid #3a3425;box-shadow:0 -10px 30px rgba(0,0,0,.35);backdrop-filter:blur(12px);padding:7px max(8px,env(safe-area-inset-left)) calc(7px + env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-right));}
+.admin-bottom-nav.show{display:block}
+.admin-bottom-nav-inner{max-width:1050px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.admin-nav-btn{appearance:none;border:1px solid transparent;background:transparent;color:#aeb1ba;border-radius:14px;min-height:62px;padding:7px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font:inherit;font-weight:800;cursor:pointer;white-space:nowrap}
+.admin-nav-btn .nav-icon{font-size:21px;line-height:1}
+.admin-nav-btn .nav-name{font-size:11px;line-height:1.2}
+.admin-nav-btn.active{color:#f4cf65;background:linear-gradient(180deg,rgba(216,183,101,.16),rgba(216,183,101,.05));border-color:#6e5b2e;box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
 .admin-section{display:none}
 .admin-section.active{display:block}
-body.sidebar-ready{padding-bottom:20px}
-@media(max-width:700px){.admin-menu-toggle{display:inline-flex}.top{justify-content:flex-start}.top .pill{margin-right:auto}.admin-sidebar{width:285px}}
-</style></head><body><div class="wrap"><div class="top"><button type="button" id="adminMenuToggle" class="admin-menu-toggle" aria-label="فتح القائمة الجانبية" onclick="toggleAdminSidebar()">☰ <span>القائمة</span></button><div class="logo">NEXUS <span style="color:white">ADMIN</span></div><span class="pill">REAL SUPABASE — FINAL</span></div>
+body.nav-ready{padding-bottom:88px}
+@media(max-width:600px){.admin-bottom-nav{padding-left:5px;padding-right:5px}.admin-bottom-nav-inner{grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}.admin-nav-btn{min-height:58px;border-radius:12px}.admin-nav-btn .nav-icon{font-size:19px}.admin-nav-btn .nav-name{font-size:10px}}
+</style></head><body><div class="wrap"><div class="top"><div class="logo">NEXUS <span style="color:white">ADMIN</span></div><span class="pill">REAL SUPABASE — FINAL</span></div>
 <section id="gate" class="card" style="max-width:520px;margin:10vh auto"><h2 style="color:var(--gold)">دخول لوحة المدير</h2><input id="email" class="field" type="email" value="khaledmohamed6050@gmail.com" placeholder="البريد الإلكتروني"><input id="password" class="field" type="password" placeholder="كلمة المرور"><button type="button" id="loginBtn" class="btn" style="width:100%" onclick="login()">تسجيل دخول المدير</button><div id="loginMsg" class="muted" style="margin-top:12px"></div></section>
 <main id="panel" class="hidden"><div class="row card"><div><b id="who"></b><div class="muted">صلاحية Admin مؤكدة من قاعدة البيانات</div></div><button type="button" class="btn secondary" onclick="logout()">تسجيل الخروج</button></div>
 <div class="grid"><div class="metric"><span class="muted">الأعضاء</span><b id="users">0</b></div><div class="metric"><span class="muted">طلبات معلقة</span><b id="pending">0</b></div><div class="metric"><span class="muted">إجمالي الأرصدة</span><b id="totalBalance">0</b></div><div class="metric"><span class="muted">المنصة</span><b id="platform">...</b></div></div>
@@ -52,41 +46,6 @@ body.sidebar-ready{padding-bottom:20px}
 <div id="balanceMsg" class="muted" style="margin-top:8px"></div>
 </section>
 
-<section id="adminSectionCustomerControl" class="card admin-section">
- <div class="row"><h2>🎛️ تحكم كامل في العميل</h2><button type="button" class="btn secondary" onclick="refreshCustomerControl()">🔄 تحديث البيانات</button></div>
- <p class="muted">اختار العميل مرة واحدة، ومن هنا تقدر تراجع بياناته وتدير رصيده ومستوى VIP وحالة الحساب.</p>
- <input id="customerControlSearch" class="field" placeholder="ابحث بالاسم أو رقم العميل أو الهاتف أو البريد أو UUID" oninput="filterCustomerControl()">
- <select id="customerControlMember" class="field" onchange="renderCustomerControl()"><option value="">اختر العميل...</option></select>
- <div id="customerControlDetails" class="item"><div class="muted">اختار عميلًا لعرض بياناته والتحكم فيه.</div></div>
- <div class="actions">
-  <button type="button" class="btn secondary" onclick="customerControlAuth()">🔐 بيانات الحساب</button>
-  <button type="button" class="btn secondary" onclick="customerControlReset()">✉️ إعادة تعيين كلمة المرور</button>
-  <button type="button" class="btn secondary" onclick="customerControlSelectForBalance()">💰 إدارة الرصيد</button>
-  <button type="button" class="btn ok" onclick="customerControlUpgrade()">👑 ترقية VIP</button>
-  <button type="button" class="btn bad" onclick="customerControlToggleStatus()">⛔ إيقاف / تفعيل الحساب</button>
-  <button type="button" class="btn danger" onclick="customerControlDelete()">🗑️ حذف العميل</button>
- </div>
- <div class="setting-box" style="margin-top:14px"><h3 style="color:var(--gold);margin-top:0">💳 تعديل الرصيد مباشرة</h3>
-  <label class="muted">العملة</label><select id="ccCurrency" class="field"><option value="EGP">جنيه مصري EGP</option><option value="USD">دولار USD</option></select>
-  <label class="muted">المبلغ</label><input id="ccAmount" class="field" type="number" min="0.01" step="0.01" placeholder="المبلغ">
-  <label class="muted">سبب التعديل (إجباري)</label><input id="ccReason" class="field" placeholder="مثال: تصحيح رصيد بناءً على طلب الدعم">
-  <div class="actions"><button type="button" class="btn ok" onclick="customerControlAdjustBalance(1)">➕ إضافة مبلغ</button><button type="button" class="btn bad" onclick="customerControlAdjustBalance(-1)">➖ خصم مبلغ</button></div>
-  <div id="customerControlMsg" class="muted" style="margin-top:8px"></div>
- </div>
- <div class="setting-box" style="margin-top:14px"><div class="row"><h3 style="color:var(--gold);margin:0">🔗 إحالات العميل</h3><button type="button" class="btn secondary" onclick="loadCustomerReferrals()">تحديث الإحالات</button></div>
-  <p class="muted">عرض الأشخاص المرتبطين بكود إحالة العميل، مع إمكانية حذف ربط الإحالة وعمولتها المسجلة.</p><div id="customerReferralsList" class="muted">اختر عميلًا ثم اضغط تحديث الإحالات.</div>
- </div>
- <div class="setting-box" style="margin-top:14px"><div class="row"><h3 style="color:var(--gold);margin:0">👑 مستويات وأجهزة العميل</h3><button type="button" class="btn secondary" onclick="loadCustomerLevels()">تحديث المستويات</button></div>
-  <p class="muted">حذف جهاز/مستوى من حساب هذا العميل فقط. هذا لا يحذف مستوى VIP من المنصة كلها.</p><div id="customerLevelsList" class="muted">اختر عميلًا ثم اضغط تحديث المستويات.</div>
- </div>
- <div class="setting-box" style="margin-top:14px"><h3 style="color:var(--gold);margin-top:0">🛠️ تعديل بيانات الحساب</h3>
-  <label class="muted">مستوى VIP في الملف الشخصي</label><input id="ccVipLevel" class="field" type="number" min="0" max="99" step="1" placeholder="0 = بدون مستوى">
-  <button type="button" class="btn secondary" onclick="customerControlSetVipLevel()">حفظ مستوى VIP</button>
-  <label class="muted" style="display:block;margin-top:12px">حالة الحساب</label><select id="ccAccountStatus" class="field"><option value="active">نشط</option><option value="suspended">موقوف مؤقتًا</option></select>
-  <button type="button" class="btn secondary" onclick="customerControlSaveStatus()">حفظ حالة الحساب</button>
- </div>
-</section>
-
 <section id="adminSectionMachines" class="card admin-section">
  <div class="row"><h2>🖥️ أجهزة العملاء</h2><button type="button" class="btn secondary" onclick="loadAdminMachines()">🔄 تحديث</button></div>
  <p class="muted">عدد الأجهزة لكل عميل، دخل كل جهاز، وإجمالي الدخل ووقت الانتهاء المتبقي.</p>
@@ -98,34 +57,6 @@ body.sidebar-ready{padding-bottom:20px}
  </div>
  <input id="machineSearch" class="field" placeholder="ابحث برقم العميل أو الاسم أو الهاتف" oninput="renderAdminMachines()">
  <div id="adminMachinesList"><div class="muted">اضغط تحديث لتحميل الأجهزة.</div></div>
-</section>
-
-<section id="adminSectionLedger" class="card admin-section">
- <div class="row"><h2>🗑️ إدارة السجل المالي</h2><button type="button" class="btn secondary" onclick="loadAdminLedger()">🔄 تحديث</button></div>
- <p class="muted">ابحث عن أي حركة في سجل رصيد العميل، ثم احذفها بعد التأكيد. الحذف يسجل نسخة تدقيقية في قاعدة البيانات، ولا يغيّر رصيد المحفظة تلقائيًا.</p>
- <input id="adminLedgerSearch" class="field" placeholder="ابحث بالاسم أو رقم العميل أو وصف العملية أو رقمها" oninput="renderAdminLedger()">
- <div id="adminLedgerList"><div class="muted">اضغط تحديث لتحميل الحركات.</div></div>
- <div id="adminLedgerMsg" class="muted" style="margin-top:8px"></div>
-</section>
-
-
-<section id="adminSectionAcquisitions" class="card admin-section">
- <div class="row"><h2>🧾 سجل الشراء والترقيات</h2><button type="button" class="btn secondary" onclick="loadAcquisitionLog()">🔄 تحديث</button></div>
- <p class="muted">هنا تقدر تميّز بين العميل الذي اشترى VIP بخصم من رصيده، والعميل الذي حصل على ترقية مجانية من الإدارة أو مكافأة إحالة. السجلات القديمة التي لا تحتوي على نوع العملية ستظهر «غير محدد» بدل التخمين.</p>
- <div class="grid" style="margin:12px 0">
-  <div class="metric"><span class="muted">شراء مدفوع</span><b id="acqPaidCount">—</b></div>
-  <div class="metric"><span class="muted">ترقيات إدارية</span><b id="acqAdminCount">—</b></div>
-  <div class="metric"><span class="muted">مكافآت إحالة</span><b id="acqReferralCount">—</b></div>
-  <div class="metric"><span class="muted">نوع غير محدد</span><b id="acqUnknownCount">—</b></div>
- </div>
- <input id="acquisitionSearch" class="field" placeholder="ابحث برقم العميل أو الاسم أو الهاتف أو VIP" oninput="renderAcquisitionLog()">
- <div class="actions" style="grid-template-columns:repeat(4,minmax(0,1fr))">
-  <button type="button" class="btn secondary" onclick="setAcquisitionFilter('all')">الكل</button>
-  <button type="button" class="btn secondary" onclick="setAcquisitionFilter('purchase')">شراء مدفوع</button>
-  <button type="button" class="btn secondary" onclick="setAcquisitionFilter('admin_upgrade')">ترقية إدارية</button>
-  <button type="button" class="btn secondary" onclick="setAcquisitionFilter('referral_reward')">مكافأة إحالة</button>
- </div>
- <div id="acquisitionLogList"><div class="muted">اضغط تحديث لتحميل السجل.</div></div>
 </section>
 
 <section id="adminSectionCurrencies" class="card admin-section">
@@ -162,24 +93,11 @@ body.sidebar-ready{padding-bottom:20px}
   <div class="setting-box"><div class="row"><div>حالة المنصة الحالية: <b id="platformText">...</b></div><button type="button" class="btn secondary" onclick="togglePlatform()">تبديل الحالة</button></div></div>
 </div>
 <hr style="border-color:#30333e;margin:18px 0">
-<hr style="border-color:#30333e;margin:18px 0">
-<h3 style="color:var(--gold);margin:0 0 8px">⏱️ مدة الأجهزة وموعد الدخل اليومي</h3>
-<p class="muted">حدد موعد احتساب الدخل حسب توقيت مصر. شغّل ملف SQL المرفق لتفعيل الإعدادات والاحتساب في قاعدة البيانات.</p>
-<div class="settings-grid">
- <div class="setting-box"><label class="muted">المدة الافتراضية للأجهزة (بالأيام)</label><input id="machineDefaultDays" class="field" type="number" min="1" max="3650" value="10"></div>
- <div class="setting-box"><label class="muted">موعد الدخل اليومي — توقيت مصر</label><input id="machineIncomeTime" class="field" type="time" value="00:00"><div class="muted">مثال: 08:30 صباحًا أو 18:00 مساءً.</div></div>
- <div class="setting-box"><label style="display:flex;align-items:center;gap:8px;margin:8px 0"><input id="machineIncomeEnabled" type="checkbox" checked style="width:20px;height:20px"> تفعيل احتساب الدخل اليومي</label></div>
-</div>
-<button type="button" class="btn" onclick="saveMachineIncomeSettings()">💾 حفظ إعدادات الأجهزة والدخل</button><div id="machineSettingsMsg" class="muted" style="margin-top:8px"></div>
-<hr style="border-color:#30333e;margin:18px 0">
 <h3 style="color:var(--gold);margin:0 0 8px">👑 ترقية العملاء</h3>
-<p class="muted">اختر العميل ومستوى VIP وحدد مدة الجهاز لهذه الترقية فقط.</p>
+<p class="muted">اختر العميل ومستوى VIP. العملية ينفذها الأدمن مباشرة لمدة 10 أيام.</p>
 <div class="settings-grid">
   <div><label class="muted">العميل</label><select id="vipMember" class="field"><option value="">اختر العميل</option></select></div>
   <div><label class="muted">مستوى VIP</label><select id="vipLevel" class="field"><option value="1">VIP 1 — 300 ج.م</option><option value="2">VIP 2 — 500 ج.م</option><option value="3">VIP 3 — 1200 ج.م</option><option value="4">VIP 4 — 1800 ج.م</option><option value="5">VIP 5 — 2500 ج.م</option><option value="6">VIP 6 — 3000 ج.م</option><option value="7">VIP 7 — 5000 ج.م</option><option value="8">VIP 8 — 7000 ج.م</option></select></div>
-  <div><label class="muted">نوع الترقية</label><select id="vipUpgradeType" class="field"><option value="admin_upgrade">ترقية مجانية من الإدارة</option><option value="referral_reward">مكافأة إحالة 3 أعضاء</option></select></div>
-  <div><label class="muted">مدة الجهاز لهذه الترقية (بالأيام)</label><input id="vipUpgradeDays" class="field" type="number" min="1" max="3650" value="10"></div>
-  <div id="vipReasonWrap"><label class="muted">سبب الترقية الإدارية (اختياري)</label><input id="vipUpgradeReason" class="field" maxlength="250" placeholder="مثال: تعويض العميل عن مشكلة تقنية"><div class="muted">اتركه فارغًا لو عايز الترقية تتم تلقائيًا بدون سبب إضافي.</div></div>
 </div>
 <button type="button" class="btn ok" onclick="adminUpgradeVip()">👑 ترقية العميل إلى VIP</button><div id="vipMsg" class="muted" style="margin-top:8px"></div>
 <div id="settingsMsg" class="muted" style="margin-top:8px"></div>
@@ -214,22 +132,40 @@ body.sidebar-ready{padding-bottom:20px}
  </div>
 </div>
 
-<div id="adminSidebarOverlay" class="admin-sidebar-overlay" onclick="closeAdminSidebar()"></div>
-<aside id="adminSidebar" class="admin-sidebar" aria-label="القائمة الجانبية لأقسام لوحة الإدارة">
-  <div class="admin-sidebar-head"><div class="logo">NEXUS <span style="color:white">ADMIN</span></div><button type="button" class="admin-sidebar-close" onclick="closeAdminSidebar()" aria-label="إغلاق القائمة">✕</button></div>
-  <div class="admin-sidebar-label">القائمة الرئيسية</div>
-  <nav class="admin-sidebar-nav">
+<div id="clientControlModal" class="action-modal hidden" role="dialog" aria-modal="true" aria-labelledby="clientControlTitle">
+ <div class="action-modal-box client-control-box">
+  <div class="row"><div id="clientControlTitle" class="action-modal-title">👤 ملف العميل</div><button type="button" class="btn secondary" onclick="closeClientControl()">إغلاق ✕</button></div>
+  <div id="clientControlSummary" class="client-control-summary">جاري تحميل بيانات العميل...</div>
+  <div class="client-control-actions">
+   <button type="button" class="btn ok" onclick="clientControlAdjustBalance()">💰 تعديل الرصيد</button>
+   <button type="button" class="btn" onclick="clientControlUpgradeVip()">👑 ترقية VIP</button>
+   <button type="button" class="btn secondary" id="clientControlStatusBtn" onclick="clientControlToggleStatus()">⏸️ إيقاف/تفعيل</button>
+   <button type="button" class="btn secondary" onclick="clientControlResetPassword()">✉️ إعادة تعيين كلمة المرور</button>
+   <button type="button" class="btn secondary" onclick="clientControlLoadMachines()">🖥️ أجهزة العميل</button>
+   <button type="button" class="btn secondary" onclick="clientControlLoadRequests()">💳 طلباته المالية</button>
+  </div>
+  <div id="clientControlExtra" class="client-control-extra"><div class="muted">اختر أحد الأقسام لعرض بياناته.</div></div>
+  <p class="muted" style="margin-bottom:0">المعاينة لا تسجل الدخول كأنها العميل. كل تعديل مالي أو إداري يمر عبر دوال الأدمن الموجودة في Supabase.</p>
+ </div>
+</div>
+<style>
+.client-control-box{width:min(780px,100%);max-height:90dvh;overflow:auto}
+.client-control-summary{background:#10131a;border:1px solid #303440;border-radius:14px;padding:14px;line-height:1.9;overflow-wrap:anywhere}
+.client-control-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0}
+.client-control-extra{background:#10131a;border:1px solid #303440;border-radius:14px;padding:12px;max-height:34vh;overflow:auto}
+.client-control-row{padding:9px 0;border-bottom:1px solid #292d37;line-height:1.7;overflow-wrap:anywhere}
+@media(max-width:560px){.client-control-actions{grid-template-columns:1fr}.client-control-box{padding:13px}}
+</style>
+<nav id="adminBottomNav" class="admin-bottom-nav" aria-label="أقسام لوحة الإدارة">
+  <div class="admin-bottom-nav-inner">
     <button type="button" class="admin-nav-btn active" data-section="adminSectionMembers" onclick="switchAdminSection('adminSectionMembers',this)"><span class="nav-icon">👥</span><span class="nav-name">الأعضاء</span></button>
     <button type="button" class="admin-nav-btn" data-section="adminSectionRequests" onclick="switchAdminSection('adminSectionRequests',this)"><span class="nav-icon">💳</span><span class="nav-name">الطلبات</span></button>
-    <button type="button" class="admin-nav-btn" data-section="adminSectionCustomerControl" onclick="switchAdminSection('adminSectionCustomerControl',this);refreshCustomerControl()"><span class="nav-icon">🎛️</span><span class="nav-name">تحكم كامل في العميل</span></button>
     <button type="button" class="admin-nav-btn" data-section="adminSectionMachines" onclick="switchAdminSection('adminSectionMachines',this);loadAdminMachines()"><span class="nav-icon">🖥️</span><span class="nav-name">الأجهزة</span></button>
-    <button type="button" class="admin-nav-btn" data-section="adminSectionLedger" onclick="switchAdminSection('adminSectionLedger',this);loadAdminLedger()"><span class="nav-icon">🗑️</span><span class="nav-name">السجل المالي والحذف</span></button>
-     <button type="button" class="admin-nav-btn" data-section="adminSectionAcquisitions" onclick="switchAdminSection('adminSectionAcquisitions',this);loadAcquisitionLog()"><span class="nav-icon">🧾</span><span class="nav-name">الشراء والترقيات</span></button>
     <button type="button" class="admin-nav-btn" data-section="adminSectionCurrencies" onclick="switchAdminSection('adminSectionCurrencies',this);loadDepositClassifications()"><span class="nav-icon">💱</span><span class="nav-name">تصنيف العملة</span></button>
     <button type="button" class="admin-nav-btn" data-section="adminSectionSettings" onclick="switchAdminSection('adminSectionSettings',this)"><span class="nav-icon">⚙️</span><span class="nav-name">إعدادات المنصة</span></button>
     <button type="button" class="admin-nav-btn" data-section="adminSectionWelcome" onclick="switchAdminSection('adminSectionWelcome',this)"><span class="nav-icon">📢</span><span class="nav-name">الترحيب</span></button>
-  </nav>
-</aside>
+  </div>
+</nav>
 <div id="actionModal" class="action-modal hidden">
   <div class="action-modal-box">
     <div id="actionModalTitle" class="action-modal-title">تأكيد العملية</div>
@@ -322,7 +258,7 @@ function renderAdminMachines(){
  rows.forEach(x=>{const key=x.user_id||x.customer_code||x.email||'unknown';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(x)});
  const html=[...groups.entries()].map(([key,items])=>{
   const first=items[0],activeCount=items.filter(isActive).length;
-  return `<div class="member"><div class="row"><div><b>${esc(first.full_name||'بدون اسم')}</b><div class="muted">رقم العميل: ${esc(first.customer_code||'غير موجود')} · الهاتف: ${esc(first.phone||'غير مسجل')}</div><div class="muted">الأجهزة: ${items.length} · النشطة: ${activeCount}</div></div><div class="balance">${money(items.reduce((a,x)=>a+Number(x.daily_income||0),0))} ج.م <div class="muted">دخل يومي للأجهزة</div></div></div><div style="display:grid;gap:9px;margin-top:12px">${items.map(x=>`<div class="item" style="margin:0"><div class="row"><b>⚙️ ${esc(x.package_name||('VIP '+(x.package_id??'')))}</b><span class="status ${isActive(x)?'approved':'rejected'}">${isActive(x)?'نشط':'منتهي'}</span></div><div class="muted" style="line-height:1.9;margin-top:6px">سعر الجهاز: <b>${money(x.price)} ج.م</b><br>الدخل اليومي: <b style="color:var(--gold)">${money(x.daily_income)} ج.م</b><br>الدخل المسجل تقديريًا: <b>${money(x.earned_income??(Number(x.daily_income||0)*Math.min(Number(x.days||10),Math.max(0,Math.floor((Date.now()-new Date(x.started_at||Date.now()).getTime())/86400000)+1))))} ج.م</b><br>مدة الجهاز: ${Number(x.days||10)} أيام<br>الوقت المتبقي: <b>${esc(remainingMachineTime(x))}</b><br>تاريخ البداية: ${x.started_at?new Date(x.started_at).toLocaleString('ar-EG'):'غير متاح'}</div></div>`).join('')}</div></div>`;
+  return `<div class="member"><div class="row"><div><b>${esc(first.full_name||'بدون اسم')}</b><div class="muted">رقم العميل: ${esc(first.customer_code||'غير موجود')} · الهاتف: ${esc(first.phone||'غير مسجل')}</div><div class="muted">الأجهزة: ${items.length} · النشطة: ${activeCount}</div></div><div class="balance">${money(items.reduce((a,x)=>a+Number(x.daily_income||0),0))} ج.م <div class="muted">دخل يومي للأجهزة</div></div></div><div style="display:grid;gap:9px;margin-top:12px">${items.map(x=>`<div class="item" style="margin:0"><div class="row"><b>⚙️ ${esc(x.package_name||('جهاز VIP '+(x.package_id??'')))}</b><span class="status ${isActive(x)?'approved':'rejected'}">${isActive(x)?'نشط':'منتهي'}</span></div><div class="muted" style="line-height:1.9;margin-top:6px">سعر الجهاز: <b>${money(x.price)} ج.م</b><br>الدخل اليومي: <b style="color:var(--gold)">${money(x.daily_income)} ج.م</b><br>الدخل المسجل تقديريًا: <b>${money(x.earned_income??(Number(x.daily_income||0)*Math.min(Number(x.days||10),Math.max(0,Math.floor((Date.now()-new Date(x.started_at||Date.now()).getTime())/86400000)+1))))} ج.م</b><br>مدة الجهاز: ${Number(x.days||10)} أيام<br>الوقت المتبقي: <b>${esc(remainingMachineTime(x))}</b><br>تاريخ البداية: ${x.started_at?new Date(x.started_at).toLocaleString('ar-EG'):'غير متاح'}</div></div>`).join('')}</div></div>`;
  }).join('');
  document.getElementById('adminMachinesList').innerHTML=html||'<div class="muted">لا توجد أجهزة مطابقة للبحث.</div>';
 }
@@ -361,54 +297,6 @@ function renderDepositClassifications(){
   const cls=egp&&usd?'pending':'approved';
   return `<div class="member"><div class="row"><div><b>${esc(x.full_name||'بدون اسم')}</b><div class="muted">رقم العميل: <b style="color:var(--gold)">${esc(x.customer_code||'غير موجود')}</b></div><div class="muted">📱 ${esc(x.phone||'غير مسجل')} · ${esc(x.email||'لا يوجد بريد')}</div></div><span class="status ${cls}">${label}</span></div><div class="grid" style="margin-top:12px"><div class="metric"><span class="muted">عدد إيداعات الجنيه المقبولة</span><b>${Number(x.egp_deposit_count||0)}</b><div class="muted">الإجمالي: ${money(x.egp_deposit_total)} ج.م</div></div><div class="metric"><span class="muted">عدد إيداعات الدولار المقبولة</span><b>${Number(x.usd_deposit_count||0)}</b><div class="muted">الإجمالي: ${money(x.usd_deposit_total)} USD</div></div></div></div>`;
  }).join('')||'<div class="muted">لا يوجد عملاء في هذا التصنيف.</div>';
-}
-let adminLedgerRows=[];
-async function loadAdminLedger(){
- const box=document.getElementById('adminLedgerList');if(!box)return;
- box.innerHTML='<div class="muted">جاري تحميل سجل الحركات...</div>';
- try{
-  const {data,error}=await init().from('wallet_ledger').select('id,user_id,amount,balance_after,entry_type,reason,admin_id,created_at').order('created_at',{ascending:false}).limit(500);
-  if(error)throw error;
-  const ids=[...new Set((data||[]).map(r=>r.user_id).filter(Boolean))];
-  let profileMap={};
-  if(ids.length){const pr=await init().from('profiles').select('id,full_name,member_code,phone,email').in('id',ids);if(pr.error)throw pr.error;profileMap=Object.fromEntries((pr.data||[]).map(x=>[x.id,x]));}
-  adminLedgerRows=(data||[]).map(r=>({...r,profile:profileMap[r.user_id]||{}}));
-  renderAdminLedger();
-  const m=document.getElementById('adminLedgerMsg');if(m)m.textContent='تم تحميل '+adminLedgerRows.length+' حركة (آخر 500 حركة).';
- }catch(e){box.innerHTML='<div class="msg err">تعذر تحميل الحركات: '+esc(e.message||String(e))+'<br>تأكد من تشغيل ملف SQL المرفق ومن صلاحيات قراءة profiles.</div>';}
-}
-function renderAdminLedger(){
- const box=document.getElementById('adminLedgerList');if(!box)return;
- const q=(document.getElementById('adminLedgerSearch')?.value||'').trim().toLowerCase();
- const rows=adminLedgerRows.filter(r=>[r.id,r.user_id,r.entry_type,r.reason,r.profile?.full_name,r.profile?.member_code,r.profile?.phone,r.profile?.email].some(v=>String(v??'').toLowerCase().includes(q)));
- box.innerHTML=rows.map(r=>`<div class="item"><div class="row"><div><b>${esc(r.reason||r.entry_type||'حركة رصيد')}</b><div class="muted">${esc(r.profile?.full_name||'عميل بدون اسم')} · رقم العميل: ${esc(r.profile?.member_code||'غير موجود')}</div><div class="muted">ID: ${esc(r.id)} · العميل: ${esc(r.user_id)}</div></div><span class="status ${Number(r.amount)>=0?'approved':'rejected'}">${money(r.amount)} ج.م</span></div><div class="muted" style="line-height:1.9;margin-top:7px">نوع الحركة: ${esc(r.entry_type||'—')}<br>الرصيد بعد الحركة: ${money(r.balance_after)} ج.م<br>التاريخ: ${r.created_at?new Date(r.created_at).toLocaleString('ar-EG'):'غير متاح'}</div><button type="button" class="btn bad" style="margin-top:10px;width:100%" onclick="deleteAdminLedgerEntry(${Number(r.id)})">🗑️ حذف هذه العملية</button></div>`).join('')||'<div class="muted">لا توجد حركات مطابقة للبحث.</div>';
-}
-async function deleteAdminLedgerEntry(id){
- const row=adminLedgerRows.find(r=>String(r.id)===String(id));if(!row)return alert('لم يتم العثور على العملية.');
- const ok=await openActionModal('⚠️ حذف حركة من السجل المالي','هل تريد حذف الحركة رقم '+id+' للعميل '+(row.profile?.full_name||row.user_id)+' بمبلغ '+money(row.amount)+' ج.م؟ سيتم حفظ نسخة تدقيقية، ولن يتغير رصيد المحفظة تلقائيًا.','تأكيد الحذف','bad',false);
- if(!ok.ok)return;
- try{const {data,error}=await init().rpc('admin_delete_wallet_ledger_entry',{p_ledger_id:Number(id)});if(error)throw error;if(data!==true && data?.ok!==true)throw new Error('لم يتم تأكيد الحذف.');await loadAdminLedger();alert('تم حذف الحركة من السجل.');}
- catch(e){alert('تعذر حذف العملية: '+(e.message||String(e)));}
-}
-
-let acquisitionRows=[],acquisitionFilter='all';
-async function loadAcquisitionLog(){
- const box=document.getElementById('acquisitionLogList');if(!box)return;box.innerHTML='<div class="muted">جاري تحميل سجل الشراء والترقيات...</div>';
- try{
-  const {data,error}=await init().from('nexus_machine_rentals').select('id,user_id,package_id,price,daily_income,days,started_at,created_at,status,acquisition_type').order('created_at',{ascending:false}).limit(1000);
-  if(error)throw error;
-  acquisitionRows=(data||[]).map(r=>{const m=members.find(x=>x.user_id===r.user_id)||{};return {...r,full_name:m.full_name||m.display_name||'',phone:m.phone||'',email:m.email||'',customer_code:m.customer_code||m.member_code||''}});
-  renderAcquisitionLog();
- }catch(e){box.innerHTML='<div class="msg err">تعذر تحميل السجل: '+esc(e.message||String(e))+'<br>قد تحتاج لتطبيق تحديث قاعدة البيانات الخاص بتصنيف عمليات الشراء والترقية.</div>';}
-}
-function setAcquisitionFilter(f){acquisitionFilter=f;renderAcquisitionLog()}
-function acquisitionType(row){const v=String(row.acquisition_type||'').toLowerCase();if(['purchase','paid_purchase','rental','paid'].includes(v))return {key:'purchase',label:'🛒 شراء مدفوع',cls:'gold'};if(['admin_upgrade','manual_upgrade'].includes(v))return {key:'admin_upgrade',label:'👑 ترقية من الإدارة',cls:'green'};if(['referral_reward','referral_upgrade','free_referral_upgrade'].includes(v))return {key:'referral_reward',label:'⭐ ترقية — مكافأة إحالة',cls:'green'};return {key:'unknown',label:'❔ نوع العملية غير محدد',cls:'gold'}}
-function renderAcquisitionLog(){
- const box=document.getElementById('acquisitionLogList');if(!box)return;const q=(document.getElementById('acquisitionSearch')?.value||'').trim().toLowerCase();
- const counts={purchase:0,admin_upgrade:0,referral_reward:0,unknown:0};acquisitionRows.forEach(r=>counts[acquisitionType(r).key]++);
- for(const [id,key] of [['acqPaidCount','purchase'],['acqAdminCount','admin_upgrade'],['acqReferralCount','referral_reward'],['acqUnknownCount','unknown']]){const el=document.getElementById(id);if(el)el.textContent=counts[key]}
- const rows=acquisitionRows.filter(r=>{const t=acquisitionType(r);const matchFilter=acquisitionFilter==='all'||t.key===acquisitionFilter;const text=[r.full_name,r.phone,r.email,r.customer_code,r.package_id,'VIP '+r.package_id].join(' ').toLowerCase();return matchFilter&&(!q||text.includes(q))});
- box.innerHTML=rows.map(r=>{const t=acquisitionType(r);const date=r.created_at||r.started_at;return `<div class="item"><div class="row"><div><b>${esc(t.label)}</b><div class="muted">${esc(r.full_name||'بدون اسم')} · رقم العميل: ${esc(r.customer_code||'غير موجود')}</div><div class="muted">الهاتف: ${esc(r.phone||'غير مسجل')} · VIP ${esc(r.package_id??'—')}</div></div><span class="status ${t.cls==='green'?'approved':'pending'}">${esc(t.key==='purchase'?'مدفوع':t.key==='unknown'?'بحاجة لتصنيف':'مجاني')}</span></div><div class="muted" style="line-height:1.9;margin-top:8px">السعر المسجل: <b>${money(r.price)} ج.م</b><br>الدخل اليومي: ${money(r.daily_income)} ج.م · المدة: ${Number(r.days||10)} أيام<br>الحالة: ${esc(r.status||'—')}<br>تاريخ العملية: ${date?new Date(date).toLocaleString('ar-EG'):'غير متاح'}<br>معرّف العملية: ${esc(r.id)}</div></div>`}).join('')||'<div class="muted">لا توجد عمليات مطابقة.</div>';
 }
 async function loadAll(){await Promise.all([loadMembers(),loadRequests(),loadPaymentSettings(),loadPlatform(),loadLoginBanner(),loadPlatformSettings()])}
 async function loadLoginBanner(){
@@ -453,7 +341,7 @@ async function saveLoginBanner(){
  }catch(e){alert('تعذر حفظ البانر: '+(e.message||String(e)));}
  finally{if(btn)btn.disabled=false;}
 }
-async function loadMembers(){try{const {data,error}=await init().rpc('admin_get_members');if(error)throw error;members=data||[];const usd=await init().from('wallet_balances_usd').select('user_id,balance');if(!usd.error){const map=new Map((usd.data||[]).map(x=>[x.user_id,Number(x.balance||0)]));members=members.map(x=>({...x,usd_balance:map.get(x.user_id)||0}));}document.getElementById('users').textContent=members.length;document.getElementById('totalBalance').textContent=money(members.reduce((s,x)=>s+Number(x.balance||0),0));fillVipMembers();fillBalanceMembers();renderMembers();if(document.getElementById("customerControlMember"))filterCustomerControl()}catch(e){document.getElementById('members').innerHTML='<div class="msg err">'+esc(e.message)+'</div>'}}
+async function loadMembers(){try{const {data,error}=await init().rpc('admin_get_members');if(error)throw error;members=data||[];const usd=await init().from('wallet_balances_usd').select('user_id,balance');if(!usd.error){const map=new Map((usd.data||[]).map(x=>[x.user_id,Number(x.balance||0)]));members=members.map(x=>({...x,usd_balance:map.get(x.user_id)||0}));}document.getElementById('users').textContent=members.length;document.getElementById('totalBalance').textContent=money(members.reduce((s,x)=>s+Number(x.balance||0),0));fillVipMembers();fillBalanceMembers();renderMembers()}catch(e){document.getElementById('members').innerHTML='<div class="msg err">'+esc(e.message)+'</div>'}}
 function renderMembers(){
 const q=(document.getElementById('search').value||'').toLowerCase().trim();
 const list=members.filter(x=>!q||[x.full_name,x.phone,x.email,x.user_id,x.customer_code].some(v=>String(v||'').toLowerCase().includes(q)));
@@ -464,7 +352,7 @@ const statusClass=status==='suspended'?'suspended-status':'active-status';
 const toggleText=status==='suspended'?'تفعيل الحساب':'إيقاف مؤقت';
 const toggleClass=status==='suspended'?'btn ok':'btn bad';
 const isAdmin=String(x.role||'member').toLowerCase()==='admin';
-return `<div class="member"><div class="membergrid"><div><b>${esc(x.full_name||'بدون اسم')}</b><div class="muted">📧 ${esc(x.email||'غير متاح')}</div><div class="muted">📱 ${esc(x.phone||'غير مسجل')}</div><div class="idline">رقم العميل: <b style="color:var(--gold)">${esc(x.customer_code||'غير موجود')}</b></div><div class="idline">UUID: ${esc(x.user_id)}</div><div class="idline">الصلاحية: ${esc(x.role||'member')}</div><span class="member-status ${statusClass}">الحالة: ${statusText}</span></div><div><div class="balance">${money(x.balance)} ج.م</div><div class="muted">رصيد EGP الحالي</div><div class="balance" style="font-size:16px;margin-top:9px">${money(x.usd_balance)} USD</div><div class="muted">رصيد USD المنفصل</div></div></div><div class="actions"><button type="button" class="btn secondary" onclick="copyId('${x.user_id}')">🆔 نسخ UUID</button><button type="button" class="btn" onclick="showMemberAuthDetails('${x.user_id}')">🔐 بيانات الدخول</button><button type="button" class="btn secondary" onclick="sendMemberPasswordReset('${x.user_id}')">✉️ إعادة تعيين كلمة السر</button><button type="button" class="btn" onclick="selectMember('${x.user_id}')">📌 اختيار</button></div></div>`}).join('')||'<div class="muted">لا يوجد أعضاء.</div>'}
+return `<div class="member"><div class="membergrid"><div><b>${esc(x.full_name||'بدون اسم')}</b><div class="muted">📧 ${esc(x.email||'غير متاح')}</div><div class="muted">📱 ${esc(x.phone||'غير مسجل')}</div><div class="idline">رقم العميل: <b style="color:var(--gold)">${esc(x.customer_code||'غير موجود')}</b></div><div class="idline">UUID: ${esc(x.user_id)}</div><div class="idline">الصلاحية: ${esc(x.role||'member')}</div><span class="member-status ${statusClass}">الحالة: ${statusText}</span></div><div><div class="balance">${money(x.balance)} ج.م</div><div class="muted">رصيد EGP الحالي</div><div class="balance" style="font-size:16px;margin-top:9px">${money(x.usd_balance)} USD</div><div class="muted">رصيد USD المنفصل</div></div></div><div class="actions"><button type="button" class="btn secondary" onclick="copyId('${x.user_id}')">🆔 نسخ UUID</button><button type="button" class="btn" onclick="showMemberAuthDetails('${x.user_id}')">🔐 بيانات الدخول</button><button type="button" class="btn secondary" onclick="sendMemberPasswordReset('${x.user_id}')">✉️ إعادة تعيين كلمة السر</button><button type="button" class="btn" onclick="selectMember('${x.user_id}')">📌 اختيار</button>${isAdmin?'':`<button type="button" class="${toggleClass}" onclick="toggleMemberStatus('${x.user_id}','${status}')">${toggleText}</button>`}<button type="button" class="btn" onclick="openClientControl('${x.user_id}')">👁️ ملف العميل والتحكم</button><button type="button" class="btn danger" onclick="deleteMember('${x.user_id}','${esc(x.email||x.user_id)}')">🗑️ حذف العضو</button></div></div>`}).join('')||'<div class="muted">لا يوجد أعضاء.</div>'}
 function copyId(id){navigator.clipboard?.writeText(id).then(()=>alert('تم نسخ UUID')).catch(()=>prompt('UUID:',id))}
 function fillBalanceMembers(){const el=document.getElementById('balanceMember');if(!el)return;const current=el.value;el.innerHTML='<option value="">اختر العميل...</option>'+members.filter(x=>String(x.role||'member').toLowerCase()!=='admin').map(x=>`<option value="${esc(x.user_id)}">${esc(x.customer_code||'بدون ID')} — ${esc(x.full_name||x.phone||x.email||'بدون اسم')} — ${money(x.balance)} ج.م</option>`).join('');if(current&&members.some(x=>x.user_id===current))el.value=current}
 function selectMember(id){
@@ -487,10 +375,7 @@ function syncMemberId(){const codeEl=document.getElementById('memberCode'),uidEl
 async function adjustBalance(direction){const x=syncMemberId(),uid=document.getElementById('memberId').value.trim(),amount=Math.abs(Number(document.getElementById('amount').value)),reason=document.getElementById('reason').value.trim();if(!uid||!x)return alert('رقم العميل غير موجود.');if(!Number.isFinite(amount)||amount<=0)return alert('اكتب مبلغًا صحيحًا أكبر من صفر.');if(!reason)return alert('اكتب سبب التعديل.');if(direction<0&&amount>Number(x.balance||0))return alert('لا يمكن خصم مبلغ أكبر من الرصيد الحالي.');const action=direction>0?'تزويد':'خصم';const result=await openActionModal('تأكيد تعديل الرصيد',`تأكيد ${action} مبلغ ${money(amount)} ج.م للعميل ${x.customer_code||x.user_id}؟`,direction>0?'موافق — تزويد الرصيد':'موافق — خصم الرصيد',direction>0?'ok':'bad',false);if(!result.ok)return;const {error}=await init().rpc('admin_adjust_balance',{p_user_id:x.user_id,p_amount:direction*amount,p_reason:reason});if(error)return alert('تعذر تعديل الرصيد: '+error.message);document.getElementById('balanceMsg').textContent=`تم ${action} ${money(amount)} ج.م بنجاح.`;document.getElementById('amount').value='';document.getElementById('reason').value='';await loadMembers();updateSelectedBalance()}
 function fillVipMembers(){const el=document.getElementById('vipMember');if(!el)return;const current=el.value;el.innerHTML='<option value="">اختر العميل...</option>'+members.filter(x=>String(x.role||'member').toLowerCase()!=='admin').map(x=>`<option value="${esc(x.user_id)}">${esc(x.customer_code||'بدون ID')} — ${esc(x.full_name||x.phone||x.email||'بدون اسم')}</option>`).join('');if(current&&members.some(x=>x.user_id===current))el.value=current;updateVipBalance()}
 function updateVipBalance(){const id=document.getElementById('vipMember')?.value;const x=members.find(m=>m.user_id===id);const el=document.getElementById('vipBalance');if(el)el.textContent=x?`الرصيد: ${money(x.balance)} ج.م`:'اختر العميل'}
-
-function toggleVipReasonField(){const wrap=document.getElementById('vipReasonWrap');const type=document.getElementById('vipUpgradeType')?.value||'admin_upgrade';if(wrap)wrap.style.display=type==='admin_upgrade'?'block':'none'}
-document.addEventListener('DOMContentLoaded',()=>{document.getElementById('vipUpgradeType')?.addEventListener('change',toggleVipReasonField);toggleVipReasonField()});
-async function adminUpgradeVip(){const uid=document.getElementById('vipMember').value,level=Number(document.getElementById('vipLevel').value),days=Number(document.getElementById('vipUpgradeDays')?.value||10),acquisitionType=document.getElementById('vipUpgradeType')?.value||'admin_upgrade',reason=(document.getElementById('vipUpgradeReason')?.value||'').trim();if(!uid)return alert('اختر العميل أولًا.');if(!Number.isInteger(days)||days<1||days>3650)return alert('حدد مدة صحيحة من يوم إلى 3650 يومًا.');const x=members.find(m=>m.user_id===uid);const result=await openActionModal('تأكيد ترقية VIP',`تأكيد ترقية العميل ${x?.customer_code||uid} إلى VIP ${level} لمدة ${days} يومًا؟`,'موافق — ترقية VIP','ok',false);if(!result.ok)return;const {data,error}=await init().rpc('admin_upgrade_vip',{p_user_id:uid,p_package_id:level,p_acquisition_type:acquisitionType,p_days:days,p_reason:reason||null});if(error)return alert('تعذر ترقية VIP: '+error.message+' — تأكد من تشغيل ملف SQL الجديد.');if(!data?.ok) return alert('لم يتم تأكيد الترقية.');document.getElementById('vipMsg').textContent=`تمت ترقية العميل إلى VIP ${level} لمدة ${days} يومًا بنجاح (${acquisitionType==='referral_reward'?'مكافأة إحالة':'ترقية إدارية'}).`;document.getElementById('vipUpgradeReason').value='';await loadMembers();updateVipBalance();await loadAcquisitionLog()}
+async function adminUpgradeVip(){const uid=document.getElementById('vipMember').value,level=Number(document.getElementById('vipLevel').value);if(!uid)return alert('اختر العميل أولًا.');const x=members.find(m=>m.user_id===uid);const result=await openActionModal('تأكيد ترقية VIP',`تأكيد ترقية العميل ${x?.customer_code||uid} إلى VIP ${level}؟`,'موافق — ترقية VIP','ok',false);if(!result.ok)return;const {data,error}=await init().rpc('admin_upgrade_vip',{p_user_id:uid,p_package_id:level});if(error)return alert('تعذر ترقية VIP: '+error.message);if(!data?.ok) return alert('لم يتم تأكيد الترقية.');document.getElementById('vipMsg').textContent=`تمت ترقية العميل إلى VIP ${level} بنجاح.`;await loadMembers();updateVipBalance()}
 async function loadRequests(){
 try{
 const {data,error}=await init().rpc('admin_get_requests');
@@ -608,32 +493,35 @@ async function copyMemberAuthDetails(){
  catch(e){prompt('انسخ بيانات الحساب:',currentMemberAuthText)}
 }
 
-function getCustomerControlMember(){const id=document.getElementById('customerControlMember')?.value;return members.find(x=>String(x.user_id)===String(id));}
-function filterCustomerControl(){const q=(document.getElementById('customerControlSearch')?.value||'').toLowerCase().trim();const el=document.getElementById('customerControlMember');if(!el)return;const cur=el.value;const list=members.filter(x=>String(x.role||'member').toLowerCase()!=='admin'&&(!q||[x.full_name,x.phone,x.email,x.user_id,x.customer_code].some(v=>String(v||'').toLowerCase().includes(q))));el.innerHTML='<option value="">اختر العميل...</option>'+list.map(x=>`<option value="${esc(x.user_id)}">${esc(x.customer_code||'بدون ID')} — ${esc(x.full_name||x.phone||x.email||'بدون اسم')}</option>`).join('');if(cur&&list.some(x=>x.user_id===cur))el.value=cur;renderCustomerControl();}
-function refreshCustomerControl(){filterCustomerControl();}
-function renderCustomerControl(){const x=getCustomerControlMember(),box=document.getElementById('customerControlDetails'),msg=document.getElementById('customerControlMsg');if(msg)msg.textContent='';if(!box)return;if(!x){box.innerHTML='<div class="muted">اختار عميلًا لعرض بياناته والتحكم فيه.</div>';return;}const status=(x.account_status||'active')==='suspended'?'موقوف مؤقتًا':'نشط';box.innerHTML=`<div class="membergrid"><div><h3 style="margin:0 0 8px;color:var(--gold)">${esc(x.full_name||'بدون اسم')}</h3><div class="muted">رقم العميل: ${esc(x.customer_code||'غير موجود')}</div><div class="muted">📱 ${esc(x.phone||'غير مسجل')}</div><div class="muted">📧 ${esc(x.email||'غير متاح')}</div><div class="muted">UUID: ${esc(x.user_id)}</div><div class="muted">الصلاحية: ${esc(x.role||'member')}</div><div class="muted">الحالة: <b>${status}</b></div></div><div><div class="balance">${money(x.balance)} ج.م</div><div class="muted">الرصيد بالجنيه</div><div class="balance" style="font-size:16px;margin-top:8px">${money(x.usd_balance)} USD</div><div class="muted">الرصيد بالدولار</div></div></div>`;;const vl=document.getElementById('ccVipLevel');if(vl)vl.value=Number(x.vip_level||0);const st=document.getElementById('ccAccountStatus');if(st)st.value=(x.account_status||'active');}
-function customerControlAuth(){const x=getCustomerControlMember();if(!x)return alert('اختار العميل أولًا.');showMemberAuthDetails(x.user_id)}
-function customerControlReset(){const x=getCustomerControlMember();if(!x)return alert('اختار العميل أولًا.');sendMemberPasswordReset(x.user_id)}
-function customerControlSelectForBalance(){const x=getCustomerControlMember();if(!x)return alert('اختار العميل أولًا.');selectMember(x.user_id);document.getElementById('ccAmount')?.focus();document.getElementById('customerControlMsg').textContent='تم تحديد العميل في نموذج الرصيد الأصلي أيضًا.';}
-function customerControlUpgrade(){const x=getCustomerControlMember();if(!x)return alert('اختار العميل أولًا.');const vip=document.getElementById('vipMember');if(vip)vip.value=x.user_id;updateVipBalance();switchAdminSection('adminSectionSettings',document.querySelector('.admin-nav-btn[data-section="adminSectionSettings"]'));document.getElementById('vipLevel')?.scrollIntoView({behavior:'smooth',block:'center'});}
-async function customerControlToggleStatus(){const x=getCustomerControlMember();if(!x)return alert('اختار العميل أولًا.');await toggleMemberStatus(x.user_id,(x.account_status||'active')==='suspended'?'suspended':'active');await loadMembers();filterCustomerControl();}
-async function customerControlDelete(){const x=getCustomerControlMember();if(!x)return alert('اختار العميل أولًا.');await deleteMember(x.user_id,x.email||x.user_id);await loadMembers();filterCustomerControl();}
-async function customerControlAdjustBalance(direction){const x=getCustomerControlMember();if(!x)return alert('اختار العميل أولًا.');const amount=Math.abs(Number(document.getElementById('ccAmount').value)),reason=document.getElementById('ccReason').value.trim(),currency=document.getElementById('ccCurrency').value;if(!Number.isFinite(amount)||amount<=0)return alert('اكتب مبلغًا صحيحًا أكبر من صفر.');if(!reason)return alert('اكتب سبب التعديل.');const balance=currency==='USD'?Number(x.usd_balance||0):Number(x.balance||0);if(direction<0&&amount>balance)return alert('لا يمكن خصم مبلغ أكبر من الرصيد الحالي.');const action=direction>0?'إضافة':'خصم';const ok=await openActionModal('تأكيد تعديل رصيد العميل',`تأكيد ${action} ${money(amount)} ${currency} للعميل ${x.customer_code||x.user_id}؟\nالسبب: ${reason}`,direction>0?'تأكيد الإضافة':'تأكيد الخصم',direction>0?'ok':'bad',false);if(!ok.ok)return;try{let result;if(currency==='EGP'){result=await init().rpc('admin_adjust_balance',{p_user_id:x.user_id,p_amount:direction*amount,p_reason:reason});}else{const c=init();const q=await c.from('wallet_balances_usd').select('balance').eq('user_id',x.user_id).maybeSingle();if(q.error)throw q.error;const next=Number(q.data?.balance||0)+direction*amount;if(next<0)throw new Error('الرصيد بالدولار غير كافٍ.');if(q.data){result=await c.from('wallet_balances_usd').update({balance:next}).eq('user_id',x.user_id);}else{result=await c.from('wallet_balances_usd').insert({user_id:x.user_id,balance:next});}if(!result.error){const au=await c.auth.getUser();const led=await c.from('wallet_ledger').insert({user_id:x.user_id,amount:direction*amount,balance_after:next,entry_type:direction>0?'admin_credit_usd':'admin_debit_usd',reason:reason+' (USD)',admin_id:au.data?.user?.id||null});if(led.error)console.warn('USD ledger insert failed',led.error.message)}}if(result.error)throw result.error;document.getElementById('customerControlMsg').textContent=`تم ${action} ${money(amount)} ${currency} بنجاح.`;document.getElementById('ccAmount').value='';document.getElementById('ccReason').value='';await loadMembers();filterCustomerControl();}catch(e){alert('تعذر تعديل الرصيد: '+(e.message||String(e))+'\nقد تحتاج صلاحيات SQL/RLS إدارية لهذه العملية.');}}
-
-
-async function loadCustomerReferrals(){const x=getCustomerControlMember(),box=document.getElementById('customerReferralsList');if(!x)return alert('اختار العميل أولًا.');box.innerHTML='<div class="muted">جاري تحميل الإحالات...</div>';try{const {data,error}=await init().rpc('admin_get_customer_referrals',{p_referrer_id:x.user_id});if(error)throw error;box.innerHTML=(data||[]).map(r=>`<div class="item"><b>${esc(r.full_name||r.display_name||'بدون اسم')}</b><div class="muted">${esc(r.customer_code||'بدون رقم')} · ${esc(r.phone||'بدون هاتف')} · ${esc(r.email||'')}</div><div class="muted">عمولة مسجلة: ${money(r.commission_amount||0)} ج.م · إيداع: ${money(r.deposit_amount||0)} ج.م</div><button type="button" class="btn danger" onclick="deleteCustomerReferral('${r.referred_user_id}')">🗑️ حذف ربط الإحالة</button></div>`).join('')||'<div class="muted">لا توجد إحالات مرتبطة بهذا العميل.</div>';}catch(e){box.innerHTML='<div class="msg err">تعذر تحميل الإحالات: '+esc(e.message||String(e))+'<br>طبّق ملف SQL المرفق ثم اضغط تحديث الإحالات.</div>';}}
-async function deleteCustomerReferral(referredId){const x=getCustomerControlMember();if(!x)return;const ok=await openActionModal('حذف إحالة','سيتم فك ربط العضو عن هذا المُحيل وحذف عمولات الإحالة المرتبطة به. لن يتم حذف حساب العضو نفسه.','حذف الإحالة','bad',false);if(!ok.ok)return;try{const {data,error}=await init().rpc('admin_delete_customer_referral',{p_referrer_id:x.user_id,p_referred_user_id:referredId});if(error)throw error;if(data!==true && data?.ok!==true)throw new Error('لم يتم تأكيد حذف الإحالة');alert('تم حذف ربط الإحالة والعمولات المرتبطة بها.');await loadCustomerReferrals();}catch(e){alert('تعذر حذف الإحالة: '+(e.message||String(e))+'\nتأكد من تطبيق ملف SQL الإداري المرفق.');}}
-async function loadCustomerLevels(){const x=getCustomerControlMember(),box=document.getElementById('customerLevelsList');if(!x)return alert('اختار العميل أولًا.');box.innerHTML='<div class="muted">جاري تحميل الأجهزة والمستويات...</div>';try{const {data,error}=await init().from('nexus_machine_rentals').select('id,package_id,price,daily_income,days,started_at,status,created_at').eq('user_id',x.user_id).order('created_at',{ascending:false});if(error)throw error;box.innerHTML=(data||[]).map(r=>`<div class="item"><b>VIP ${esc(r.package_id)}</b><div class="muted">رقم الجهاز/العملية: ${esc(r.id)} · السعر ${money(r.price)} ج.م · دخل يومي ${money(r.daily_income)} ج.م</div><div class="muted">المدة: ${Number(r.days||10)} يوم · الحالة: ${esc(r.status||'—')} · البداية: ${r.started_at?new Date(r.started_at).toLocaleString('ar-EG'):'—'}</div><button type="button" class="btn danger" onclick="deleteCustomerLevel('${r.id}')">🗑️ حذف هذا المستوى من العميل</button></div>`).join('')||'<div class="muted">لا توجد أجهزة/مستويات لهذا العميل.</div>';}catch(e){box.innerHTML='<div class="msg err">تعذر تحميل المستويات: '+esc(e.message||String(e))+'</div>';}}
-async function deleteCustomerLevel(rentalId){const x=getCustomerControlMember();if(!x)return;const ok=await openActionModal('حذف مستوى من العميل','سيتم حذف سجل الجهاز المحدد فقط وتحديث مستوى VIP الظاهر للعميل. سيتم حفظ نسخة تدقيقية قبل الحذف. راجع أثر ذلك على الأرباح والسجلات المرتبطة قبل المتابعة.','حذف الجهاز/المستوى','bad',false);if(!ok.ok)return;try{const {data,error}=await init().rpc('admin_delete_customer_machine',{p_rental_id:Number(rentalId),p_user_id:x.user_id});if(error)throw error;if(data!==true && data?.ok!==true)throw new Error('لم يتم تأكيد حذف الجهاز');alert('تم حذف سجل الجهاز المحدد وتحديث مستوى VIP.');await loadCustomerLevels();await loadMembers();filterCustomerControl();}catch(e){alert('تعذر حذف المستوى: '+(e.message||String(e))+'\nتأكد من تشغيل ملف SQL الخاص بحذف أجهزة العملاء.');}}
-async function customerControlSetVipLevel(){const x=getCustomerControlMember();if(!x)return alert('اختار العميل أولًا.');const level=Number(document.getElementById('ccVipLevel').value);if(!Number.isInteger(level)||level<0||level>99)return alert('اكتب مستوى صحيحًا من 0 إلى 99.');const ok=await openActionModal('تعديل مستوى VIP','تغيير vip_level في ملف العميل فقط إلى '+level+'. هذا لا ينشئ جهازًا ولا يحذف الأجهزة.','حفظ المستوى','ok',false);if(!ok.ok)return;try{const {error}=await init().from('profiles').update({vip_level:level}).eq('id',x.user_id);if(error)throw error;alert('تم تحديث مستوى VIP في الملف الشخصي.');await loadMembers();filterCustomerControl();}catch(e){alert('تعذر تحديث المستوى: '+(e.message||String(e)));}}
-async function customerControlSaveStatus(){const x=getCustomerControlMember();if(!x)return alert('اختار العميل أولًا.');const status=document.getElementById('ccAccountStatus').value;try{const {error}=await init().from('profiles').update({account_status:status}).eq('id',x.user_id);if(error)throw error;alert('تم تحديث حالة الحساب.');await loadMembers();filterCustomerControl();}catch(e){alert('تعذر تحديث الحالة: '+(e.message||String(e)));}}
-
-function switchAdminSection(sectionId,btn){document.querySelectorAll('.admin-section').forEach(el=>el.classList.toggle('active',el.id===sectionId));document.querySelectorAll('.admin-nav-btn').forEach(el=>el.classList.toggle('active',el.dataset.section===sectionId));closeAdminSidebar();window.scrollTo({top:0,behavior:'smooth'});}
-function showAdminBottomNav(){document.body.classList.add('sidebar-ready');}
-function toggleAdminSidebar(){const side=document.getElementById('adminSidebar');const overlay=document.getElementById('adminSidebarOverlay');if(!side||!overlay)return;const open=!side.classList.contains('open');side.classList.toggle('open',open);overlay.classList.toggle('show',open);document.body.style.overflow=open?'hidden':'';}
-function closeAdminSidebar(){document.getElementById('adminSidebar')?.classList.remove('open');document.getElementById('adminSidebarOverlay')?.classList.remove('show');document.body.style.overflow='';}
-async function loadPlatformSettings(){try{const {data,error}=await init().rpc('get_platform_settings');if(error)throw error;const x=Array.isArray(data)?(data[0]||{}):(data||{});const s=document.getElementById('supportUrl');if(s)s.value=x.support_url||'https://t.me/nex893';const d=document.getElementById('depositNumberAdmin2');if(d&&!d.value)d.value=x.deposit_number||'';const mv=document.getElementById('bannerMaxViews');if(mv)mv.value=Math.max(1,Number(x.banner_max_views||1));const rh=document.getElementById('bannerRepeatHours');if(rh)rh.value=Math.max(0,Number(x.banner_repeat_hours||0));const rate=document.getElementById('usdExchangeRate');if(rate)rate.value=Number(x.usd_exchange_rate||50);const md=document.getElementById('machineDefaultDays');if(md)md.value=Number(x.machine_default_days||10);const mt=document.getElementById('machineIncomeTime');if(mt)mt.value=String(x.machine_income_time||'00:00').slice(0,5);const me=document.getElementById('machineIncomeEnabled');if(me)me.checked=x.machine_income_enabled!==false;const vd=document.getElementById('vipUpgradeDays');if(vd)vd.value=Number(x.machine_default_days||10);}catch(e){const m=document.getElementById('settingsMsg');if(m)m.textContent=e.message||String(e)}}
-async function saveMachineIncomeSettings(){const days=Number(document.getElementById('machineDefaultDays')?.value||10),time=document.getElementById('machineIncomeTime')?.value||'00:00',enabled=!!document.getElementById('machineIncomeEnabled')?.checked,msg=document.getElementById('machineSettingsMsg');if(!Number.isInteger(days)||days<1||days>3650)return alert('المدة الافتراضية يجب أن تكون بين 1 و3650 يومًا.');if(!/^([01]\d|2[0-3]):[0-5]\d$/.test(time))return alert('اختر وقتًا صحيحًا.');if(msg)msg.textContent='جاري حفظ الإعدادات...';const {data,error}=await init().rpc('admin_set_machine_income_settings',{p_default_days:days,p_income_time:time,p_enabled:enabled});if(error){if(msg)msg.textContent='تعذر الحفظ: '+error.message+' — شغّل ملف SQL المرفق أولًا.';return}if(msg)msg.textContent='تم حفظ الإعدادات. موعد الدخل '+time+' بتوقيت مصر، والمدة الافتراضية '+days+' يومًا.';const vd=document.getElementById('vipUpgradeDays');if(vd)vd.value=days;}
+let activeControlMemberId=null;
+function openClientControl(userId){
+ const x=members.find(m=>String(m.user_id)===String(userId));
+ if(!x)return alert('تعذر العثور على العميل. حدّث قائمة الأعضاء وحاول مرة أخرى.');
+ if(String(x.role||'member').toLowerCase()==='admin')return alert('معاينة التحكم مخصصة لحسابات العملاء وليست حسابات الأدمن.');
+ activeControlMemberId=String(userId);
+ const modal=document.getElementById('clientControlModal');
+ const summary=document.getElementById('clientControlSummary');
+ const extra=document.getElementById('clientControlExtra');
+ const status=(x.account_status||'active')==='suspended'?'موقوف مؤقتًا':'نشط';
+ document.getElementById('clientControlTitle').textContent='👤 ملف العميل — '+(x.customer_code||x.full_name||x.phone||'عميل');
+ summary.replaceChildren();
+ const rows=[['الاسم',x.full_name],['رقم العميل',x.customer_code],['الهاتف',x.phone],['البريد الإلكتروني',x.email],['UUID',x.user_id],['الصلاحية',x.role||'member'],['حالة الحساب',status],['رصيد EGP',money(x.balance)+' ج.م'],['رصيد USD',money(x.usd_balance)+' USD']];
+ rows.forEach(([label,value])=>{const row=document.createElement('div');row.className='client-control-row';const b=document.createElement('b');b.textContent=label+': ';const v=document.createElement('span');v.textContent=(value===null||value===undefined||value==='')?'غير متاح':String(value);row.append(b,v);summary.appendChild(row)});
+ const statusBtn=document.getElementById('clientControlStatusBtn');statusBtn.textContent=(x.account_status||'active')==='suspended'?'▶️ إعادة تفعيل الحساب':'⏸️ إيقاف الحساب مؤقتًا';
+ extra.innerHTML='<div class="muted">اختر أحد الأقسام لعرض بياناته.</div>';
+ modal.classList.remove('hidden');
+}
+function closeClientControl(){document.getElementById('clientControlModal')?.classList.add('hidden');activeControlMemberId=null}
+function currentControlMember(){return members.find(m=>String(m.user_id)===String(activeControlMemberId))}
+function clientControlAdjustBalance(){const x=currentControlMember();if(!x)return;closeClientControl();selectMember(x.user_id);document.getElementById('balanceMember')?.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>document.getElementById('amount')?.focus(),250)}
+function clientControlUpgradeVip(){const x=currentControlMember();if(!x)return;const el=document.getElementById('vipMember');if(el)el.value=x.user_id;updateVipBalance();closeClientControl();switchAdminSection('adminSectionSettings',document.querySelector('.admin-nav-btn[data-section="adminSectionSettings"]'));document.getElementById('vipMember')?.scrollIntoView({behavior:'smooth',block:'center'})}
+async function clientControlToggleStatus(){const x=currentControlMember();if(!x)return;await toggleMemberStatus(x.user_id,(x.account_status||'active')==='suspended'?'suspended':'active');await loadMembers();const fresh=members.find(m=>String(m.user_id)===String(x.user_id));if(fresh)openClientControl(fresh.user_id);}
+async function clientControlResetPassword(){const x=currentControlMember();if(!x)return;await sendMemberPasswordReset(x.user_id)}
+async function clientControlLoadMachines(){const x=currentControlMember();if(!x)return;const box=document.getElementById('clientControlExtra');box.textContent='جاري تحميل أجهزة العميل...';try{const {data,error}=await init().rpc('admin_get_all_machines');if(error)throw error;const rows=(Array.isArray(data)?data:[]).filter(r=>String(r.user_id||r.member_id||'')===String(x.user_id));if(!rows.length){box.innerHTML='<div class="muted">لا توجد أجهزة لهذا العميل، أو أن دالة الأجهزة لا تعيد معرّف العميل.</div>';return}box.replaceChildren();rows.forEach(r=>{const row=document.createElement('div');row.className='client-control-row';const vals=[['الجهاز',r.package_name||r.name||('VIP '+(r.package_id??''))],['الحالة',r.status],['الدخل اليومي',r.daily_income==null?'غير متاح':money(r.daily_income)+' ج.م'],['بدأ في',r.started_at||r.created_at],['المدة',r.days==null?'غير متاح':r.days+' يوم']];row.textContent=vals.map(([k,v])=>k+': '+(v??'غير متاح')).join(' — ');box.appendChild(row)})}catch(e){box.textContent='تعذر تحميل الأجهزة: '+(e.message||String(e))}}
+async function clientControlLoadRequests(){const x=currentControlMember();if(!x)return;const box=document.getElementById('clientControlExtra');box.textContent='جاري تحميل طلبات العميل...';try{const {data,error}=await init().rpc('admin_get_requests');if(error)throw error;const rows=(Array.isArray(data)?data:[]).filter(r=>String(r.user_id)===String(x.user_id));if(!rows.length){box.innerHTML='<div class="muted">لا توجد طلبات مالية لهذا العميل.</div>';return}box.replaceChildren();rows.forEach(r=>{const row=document.createElement('div');row.className='client-control-row';const kind=r.request_type==='deposit'?'إيداع':'سحب';const amount=Number(r.requested_amount??r.amount??0);row.textContent='#'+r.id+' — '+kind+' — '+money(amount)+' '+String(r.request_currency||r.currency||'EGP')+' — الحالة: '+(r.status||'غير متاح')+' — '+(r.created_at?new Date(r.created_at).toLocaleString('ar-EG'):'وقت غير متاح');box.appendChild(row)})}catch(e){box.textContent='تعذر تحميل الطلبات: '+(e.message||String(e))}}
+function switchAdminSection(sectionId,btn){document.querySelectorAll('.admin-section').forEach(el=>el.classList.toggle('active',el.id===sectionId));document.querySelectorAll('.admin-nav-btn').forEach(el=>el.classList.toggle('active',el===btn));window.scrollTo({top:0,behavior:'smooth'});}
+function showAdminBottomNav(){document.getElementById('adminBottomNav')?.classList.add('show');document.body.classList.add('nav-ready');}
+async function loadPlatformSettings(){try{const {data,error}=await init().rpc('get_platform_settings');if(error)throw error;const x=Array.isArray(data)?(data[0]||{}):(data||{});const s=document.getElementById('supportUrl');if(s)s.value=x.support_url||'https://t.me/nex893';const d=document.getElementById('depositNumberAdmin2');if(d&&!d.value)d.value=x.deposit_number||'';const mv=document.getElementById('bannerMaxViews');if(mv)mv.value=Math.max(1,Number(x.banner_max_views||1));const rh=document.getElementById('bannerRepeatHours');if(rh)rh.value=Math.max(0,Number(x.banner_repeat_hours||0));const rate=document.getElementById('usdExchangeRate');if(rate)rate.value=Number(x.usd_exchange_rate||50);}catch(e){const m=document.getElementById('settingsMsg');if(m)m.textContent=e.message||String(e)}}
 async function saveUsdExchangeRate(){const el=document.getElementById('usdExchangeRate');const rate=Number(el?.value);if(!Number.isFinite(rate)||rate<1||rate>1000)return alert('اكتب سعر صرف صحيحًا بين 1 و1000.');const {error}=await init().rpc('admin_set_usd_exchange_rate',{p_rate:rate});if(error)return alert('تعذر حفظ سعر الصرف: '+error.message);document.getElementById('settingsMsg').textContent='تم حفظ سعر الصرف: 1 USD = '+money(rate)+' ج.م.';}
 async function saveSupportUrl(){const u=document.getElementById('supportUrl').value.trim();if(!/^https?:\/\//i.test(u))return alert('اكتب رابطًا صحيحًا يبدأ بـ https://');const {error}=await init().rpc('admin_set_support_url',{p_url:u});if(error)return alert('تعذر حفظ رابط الدعم: '+error.message);document.getElementById('settingsMsg').textContent='تم حفظ رابط الدعم الفني.'}
 async function deleteRequest(id,status){if(status!=='rejected')return alert('يمكن حذف الطلبات المرفوضة فقط، أما الطلبات المقبولة فتظل محفوظة كسجل مالي.');const result=await openActionModal('🗑️ حذف الطلب','هل تريد حذف الطلب المرفوض رقم #'+id+' من سجل الطلبات؟','موافق — حذف الطلب','bad',false);if(!result.ok)return;try{const {data,error}=await init().rpc('admin_delete_wallet_request',{p_request_id:Number(id)});if(error)throw error;if(data!==true && data?.ok!==true)throw new Error('لم يتم تأكيد الحذف.');alert('تم حذف الطلب المرفوض من السجل.');await loadRequests();}catch(e){alert('تعذر حذف الطلب: '+(e.message||String(e)))}}
